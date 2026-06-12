@@ -13,7 +13,7 @@ Userscript Tampermonkey pour le [Waze Map Editor](https://www.waze.com/editor) -
 
 ## Description
 
-Compare les noms de rues des segments visibles avec le **répertoire officiel des rues** de la Confédération (swisstopo, base légale [GeoNV](https://www.fedlex.admin.ch/eli/cc/2008/272/fr)), via l'API [api3.geo.admin.ch](https://api3.geo.admin.ch). Le répertoire fédéral est agrégé quotidiennement depuis les données de la mensuration officielle cantonale/communale: rien à gagner à interroger les guichets cantonaux en plus.
+Compare les noms de rues des segments visibles avec le **répertoire officiel des rues** de la Confédération (swisstopo, base légale [GeoNV](https://www.fedlex.admin.ch/eli/cc/2008/393/fr)), via l'API [api3.geo.admin.ch](https://api3.geo.admin.ch). Le répertoire fédéral est agrégé quotidiennement depuis les données de la mensuration officielle cantonale/communale: rien à gagner à interroger les guichets cantonaux en plus.
 
 ## Fonctionnalités
 
@@ -58,7 +58,7 @@ Compare les noms de rues des segments visibles avec le **répertoire officiel de
 
 ## Beschreibung
 
-Vergleicht die Strassennamen der sichtbaren Segmente mit dem **amtlichen Strassenverzeichnis** des Bundes (swisstopo, Rechtsgrundlage [GeoNV](https://www.fedlex.admin.ch/eli/cc/2008/272/de)) über die API [api3.geo.admin.ch](https://api3.geo.admin.ch). Das Bundesverzeichnis wird täglich aus den Daten der amtlichen Vermessung (Kantone/Gemeinden) aktualisiert - kantonale Geoportale bringen daher keinen Mehrwert.
+Vergleicht die Strassennamen der sichtbaren Segmente mit dem **amtlichen Strassenverzeichnis** des Bundes (swisstopo, Rechtsgrundlage [GeoNV](https://www.fedlex.admin.ch/eli/cc/2008/393/de)) über die API [api3.geo.admin.ch](https://api3.geo.admin.ch). Das Bundesverzeichnis wird täglich aus den Daten der amtlichen Vermessung (Kantone/Gemeinden) aktualisiert - kantonale Geoportale bringen daher keinen Mehrwert.
 
 ## Funktionen
 
@@ -103,7 +103,7 @@ Vergleicht die Strassennamen der sichtbaren Segmente mit dem **amtlichen Strasse
 
 ## Descrizione
 
-Confronta i nomi delle strade dei segmenti visibili con il **repertorio ufficiale delle strade** della Confederazione (swisstopo, base legale [OGeoN](https://www.fedlex.admin.ch/eli/cc/2008/272/it)) tramite l'API [api3.geo.admin.ch](https://api3.geo.admin.ch). Il repertorio federale è aggiornato ogni giorno dai dati della misurazione ufficiale (cantoni/comuni) - i geoportali cantonali non aggiungono nulla.
+Confronta i nomi delle strade dei segmenti visibili con il **repertorio ufficiale delle strade** della Confederazione (swisstopo, base legale [OGeoN](https://www.fedlex.admin.ch/eli/cc/2008/393/it)) tramite l'API [api3.geo.admin.ch](https://api3.geo.admin.ch). Il repertorio federale è aggiornato ogni giorno dai dati della misurazione ufficiale (cantoni/comuni) - i geoportali cantonali non aggiungono nulla.
 
 ## Funzionalità
 
@@ -148,7 +148,7 @@ Confronta i nomi delle strade dei segmenti visibili con il **repertorio ufficial
 
 ## Description
 
-Compares the street names of visible segments with the Swiss federal **official directory of streets** (swisstopo, legal basis [GeoNV](https://www.fedlex.admin.ch/eli/cc/2008/272/en)) through the [api3.geo.admin.ch](https://api3.geo.admin.ch) API. The federal register is refreshed daily from cantonal/communal cadastral surveying data - cantonal portals add nothing for street names.
+Compares the street names of visible segments with the Swiss federal **official directory of streets** (swisstopo, legal basis [GeoNV](https://www.fedlex.admin.ch/eli/cc/2008/393/en)) through the [api3.geo.admin.ch](https://api3.geo.admin.ch) API. The federal register is refreshed daily from cantonal/communal cadastral surveying data - cantonal portals add nothing for street names.
 
 ## Features
 
