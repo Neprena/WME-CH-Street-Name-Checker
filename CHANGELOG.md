@@ -3,6 +3,12 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.1.1] - 2026-06-12
+
+### Fixed
+- Every street reported `NOT_FOUND` with "0 official streets" since 1.0.0: in geojson mode the identify API returns the register fields under `properties`, not `attributes`, so every fetched entry was silently dropped. An integration test against the real API now guards the response shape.
+- The persistent cache poisoned by 1.1.0 (empty tiles) is dropped automatically on update (IndexedDB schema bump).
+
 ## [1.1.0] - 2026-06-12
 
 ### Added

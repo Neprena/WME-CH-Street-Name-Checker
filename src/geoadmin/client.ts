@@ -71,7 +71,13 @@ async function httpGetJson(url: string, signal?: AbortSignal): Promise<unknown> 
 }
 
 interface IdentifyResponse {
-  results?: Array<{ attributes?: Record<string, unknown>; geometry?: unknown }>;
+  results?: Array<{
+    /** Esri format (no geometryFormat param). */
+    attributes?: Record<string, unknown>;
+    /** GeoJSON format (geometryFormat=geojson) puts the fields here instead. */
+    properties?: Record<string, unknown>;
+    geometry?: unknown;
+  }>;
 }
 
 interface GeoJsonLike {
@@ -154,7 +160,7 @@ export async function fetchOfficialStreets(
     const data = (await httpGetJson(`${BASE_URL}?${params.toString()}`, signal)) as IdentifyResponse;
     const results = data.results ?? [];
     for (const r of results) {
-      const street = parseAttributes(r.attributes, r.geometry);
+      const street = parseAttributes(r.properties ?? r.attributes, r.geometry);
       if (street) out.push(street);
     }
     if (results.length < PAGE_SIZE) return out;

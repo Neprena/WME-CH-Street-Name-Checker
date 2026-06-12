@@ -30,11 +30,14 @@ export class IdbTileStore implements TileStoreLike {
   private open(): Promise<IDBDatabase> {
     if (!this.dbPromise) {
       this.dbPromise = new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, 1);
+        // v2: drops tiles persisted by 1.1.0, which stored empty entry lists
+        // because of the geojson attributes/properties parsing regression.
+        const request = indexedDB.open(DB_NAME, 2);
         request.onupgradeneeded = () => {
-          if (!request.result.objectStoreNames.contains(STORE_NAME)) {
-            request.result.createObjectStore(STORE_NAME, { keyPath: "key" });
+          if (request.result.objectStoreNames.contains(STORE_NAME)) {
+            request.result.deleteObjectStore(STORE_NAME);
           }
+          request.result.createObjectStore(STORE_NAME, { keyPath: "key" });
         };
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error ?? new Error("IndexedDB open failed"));

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.1.0
+// @version      1.1.1
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -42,11 +42,12 @@
     open() {
       if (!this.dbPromise) {
         this.dbPromise = new Promise((resolve, reject) => {
-          const request = indexedDB.open(DB_NAME, 1);
+          const request = indexedDB.open(DB_NAME, 2);
           request.onupgradeneeded = () => {
-            if (!request.result.objectStoreNames.contains(STORE_NAME)) {
-              request.result.createObjectStore(STORE_NAME, { keyPath: "key" });
+            if (request.result.objectStoreNames.contains(STORE_NAME)) {
+              request.result.deleteObjectStore(STORE_NAME);
             }
+            request.result.createObjectStore(STORE_NAME, { keyPath: "key" });
           };
           request.onsuccess = () => resolve(request.result);
           request.onerror = () => reject(request.error ?? new Error("IndexedDB open failed"));
@@ -209,7 +210,7 @@
       const data = await httpGetJson(`${BASE_URL}?${params.toString()}`, signal);
       const results = data.results ?? [];
       for (const r of results) {
-        const street = parseAttributes(r.attributes, r.geometry);
+        const street = parseAttributes(r.properties ?? r.attributes, r.geometry);
         if (street) out.push(street);
       }
       if (results.length < PAGE_SIZE) return out;
@@ -1994,7 +1995,7 @@ ${statusChipRules}
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.1.0"} · `));
+      footer.appendChild(el("span", "chk-muted", `v${"1.1.1"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/wme-ch-street-name-checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2546,7 +2547,7 @@ ${statusChipRules}
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.1.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.1.1"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();
