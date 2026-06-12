@@ -8,13 +8,14 @@ import {
   isFixInFlight,
   withFixLock,
 } from "../fix";
-import { t } from "../i18n";
 import { log } from "../log";
 import { STATUS_STYLES } from "../map-layer";
 import type { Issue } from "../matching/evaluate";
 import type { Scanner } from "../scan";
 import type { SettingsStore } from "../settings";
 import { formatNote, LEGEND_KEYS, STATE_KEYS } from "./tab";
+import { mapGeoAdminUrlForGeometry } from "../geoadmin/links";
+import { getLocale, t } from "../i18n";
 
 const CONTAINER_ID = "chk-edit-helper";
 /** The WME edit panel renders asynchronously after a selection; retry injection. */
@@ -129,6 +130,14 @@ export class EditPanelBox {
 
     dot.style.background = STATUS_STYLES[issue.status].strokeColor;
     statusText.textContent = issue.status;
+    const geoLink = document.createElement("a");
+    geoLink.textContent = "↗";
+    geoLink.className = "chk-geolink";
+    geoLink.href = mapGeoAdminUrlForGeometry(issue.geometry, getLocale());
+    geoLink.target = "_blank";
+    geoLink.rel = "noopener";
+    geoLink.title = t("geoAdminLinkTitle");
+    head.appendChild(geoLink);
 
     const detail = document.createElement("div");
     detail.className = "chk-muted";

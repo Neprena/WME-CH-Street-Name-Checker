@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.7.0
+// @version      1.8.0
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -378,6 +378,7 @@
     nextIssue: "Next issue",
     nextIssueTitle: "Select the next mismatching segment",
     locateTitle: "Center the map on the segment",
+    geoAdminLinkTitle: "Open this spot on map.geo.admin.ch (official register layer)",
     filterChipTitle: "Filter the list by this status",
     unnamed: "(unnamed)",
     noteUnofficial: "unofficial",
@@ -455,6 +456,7 @@
     nextIssue: "Écart suivant",
     nextIssueTitle: "Sélectionner le segment en écart suivant",
     locateTitle: "Centrer la carte sur le segment",
+    geoAdminLinkTitle: "Ouvrir cet endroit sur map.geo.admin.ch (couche du répertoire officiel)",
     filterChipTitle: "Filtrer la liste sur ce statut",
     unnamed: "(sans nom)",
     noteUnofficial: "non officiel",
@@ -532,6 +534,7 @@
     nextIssue: "Nächste Abweichung",
     nextIssueTitle: "Nächstes abweichendes Segment auswählen",
     locateTitle: "Karte auf das Segment zentrieren",
+    geoAdminLinkTitle: "Diese Stelle auf map.geo.admin.ch öffnen (amtliche Verzeichnis-Ebene)",
     filterChipTitle: "Liste nach diesem Status filtern",
     unnamed: "(unbenannt)",
     noteUnofficial: "inoffiziell",
@@ -609,6 +612,7 @@
     nextIssue: "Prossima differenza",
     nextIssueTitle: "Seleziona il prossimo segmento con differenza",
     locateTitle: "Centra la mappa sul segmento",
+    geoAdminLinkTitle: "Apri questo punto su map.geo.admin.ch (livello del repertorio ufficiale)",
     filterChipTitle: "Filtra l'elenco per questo stato",
     unnamed: "(senza nome)",
     noteUnofficial: "non ufficiale",
@@ -676,6 +680,9 @@
   var current = "en";
   function setLocale(code) {
     current = code;
+  }
+  function getLocale() {
+    return current;
   }
   function resolveLocale(preference, wmeLocaleCode) {
     if (preference !== "auto") return preference;
@@ -2039,6 +2046,32 @@
     }
   };
 
+  // src/geoadmin/links.ts
+  function wgs84ToLv95(lon, lat) {
+    const phi = (lat * 3600 - 169028.66) / 1e4;
+    const lambda = (lon * 3600 - 26782.5) / 1e4;
+    const e = 260007237e-2 + 211455.93 * lambda - 10938.51 * lambda * phi - 0.36 * lambda * phi * phi - 44.54 * lambda * lambda * lambda;
+    const n = 120014707e-2 + 308807.95 * phi + 3745.25 * lambda * lambda + 76.63 * phi * phi - 194.56 * lambda * lambda * phi + 119.79 * phi * phi * phi;
+    return { e, n };
+  }
+  var REGISTER_LAYER = "ch.swisstopo.amtliches-strassenverzeichnis";
+  function mapGeoAdminUrl(lon, lat, locale) {
+    const { e, n } = wgs84ToLv95(lon, lat);
+    const params = new URLSearchParams({
+      lang: locale,
+      E: e.toFixed(1),
+      N: n.toFixed(1),
+      zoom: "11",
+      layers: REGISTER_LAYER
+    });
+    return `https://map.geo.admin.ch/?${params.toString()}`;
+  }
+  function mapGeoAdminUrlForGeometry(geometry, locale) {
+    const points = samplePoints(geometry);
+    const mid = points[Math.floor(points.length / 2)] ?? [0, 0];
+    return mapGeoAdminUrl(mid[0], mid[1], locale);
+  }
+
   // src/ui/styles.ts
   var statusChipRules = Object.keys(STATUS_STYLES).map(
     (status) => `
@@ -2072,6 +2105,7 @@ ${statusChipRules}
 .chk-row.chk-selected { background: #e0efff; }
 .chk-row-meta { color: #888; flex: 1; }
 .chk-locate { font-size: 13px; line-height: 1; padding: 0 5px; }
+a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3px; padding: 0 5px; color: #1a73e8; background: #fff; }
 .chk-settings summary { cursor: pointer; font-weight: bold; margin: 4px 0; }
 .chk-settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; margin: 4px 0; }
 .chk-settings label { display: flex; align-items: center; gap: 4px; font-weight: normal; }
@@ -2268,7 +2302,7 @@ ${statusChipRules}
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.7.0"} · `));
+      footer.appendChild(el("span", "chk-muted", `v${"1.8.0"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/WME-CH-Street-Name-Checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2415,6 +2449,13 @@ ${statusChipRules}
         `${ROAD_TYPE_LABELS.get(issue.roadType) ?? `type ${issue.roadType}`} · ${Math.round(issue.length)} m${issue.cityName ? ` · ${issue.cityName}` : ""}`
       );
       row.appendChild(meta);
+      const geoLink = el("a", "chk-locate chk-geolink", "↗");
+      geoLink.href = mapGeoAdminUrlForGeometry(issue.geometry, getLocale());
+      geoLink.target = "_blank";
+      geoLink.rel = "noopener";
+      geoLink.title = t("geoAdminLinkTitle");
+      geoLink.addEventListener("click", (ev) => ev.stopPropagation());
+      row.appendChild(geoLink);
       const locateBtn = el("button", "chk-locate", "⌖");
       locateBtn.title = t("locateTitle");
       locateBtn.addEventListener("click", (ev) => {
@@ -2760,6 +2801,14 @@ ${statusChipRules}
       }
       dot.style.background = STATUS_STYLES[issue.status].strokeColor;
       statusText.textContent = issue.status;
+      const geoLink = document.createElement("a");
+      geoLink.textContent = "↗";
+      geoLink.className = "chk-geolink";
+      geoLink.href = mapGeoAdminUrlForGeometry(issue.geometry, getLocale());
+      geoLink.target = "_blank";
+      geoLink.rel = "noopener";
+      geoLink.title = t("geoAdminLinkTitle");
+      head.appendChild(geoLink);
       const detail = document.createElement("div");
       detail.className = "chk-muted";
       detail.textContent = t(LEGEND_KEYS[issue.status]);
@@ -2884,7 +2933,7 @@ ${statusChipRules}
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.7.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.8.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();

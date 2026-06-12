@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.8.0] - 2026-06-12
+
+### Added
+- Direct link to map.geo.admin.ch on every issue (list rows and edit-panel box): opens the spot centered with the official street register layer enabled, in the interface language. WGS84 to LV95 conversion via the official swisstopo approximation formulas.
+
 ## [1.7.0] - 2026-06-12
 
 ### Added

@@ -12,6 +12,8 @@ import { STATUS_STYLES } from "../map-layer";
 import type { Issue, IssueNote, IssueStatus } from "../matching/evaluate";
 import type { ScanSnapshot, Scanner } from "../scan";
 import { ALL_STATUSES, ROAD_TYPE_OPTIONS, type CityScoping, type Settings, type SettingsStore } from "../settings";
+import { mapGeoAdminUrlForGeometry } from "../geoadmin/links";
+import { getLocale } from "../i18n";
 import { injectStyles } from "./styles";
 
 // Road type names stay in English on purpose: they are the WME community's
@@ -390,6 +392,13 @@ export class TabUI {
       `${ROAD_TYPE_LABELS.get(issue.roadType) ?? `type ${issue.roadType}`} · ${Math.round(issue.length)} m${issue.cityName ? ` · ${issue.cityName}` : ""}`,
     );
     row.appendChild(meta);
+    const geoLink = el("a", "chk-locate chk-geolink", "↗") as HTMLAnchorElement;
+    geoLink.href = mapGeoAdminUrlForGeometry(issue.geometry, getLocale());
+    geoLink.target = "_blank";
+    geoLink.rel = "noopener";
+    geoLink.title = t("geoAdminLinkTitle");
+    geoLink.addEventListener("click", (ev) => ev.stopPropagation());
+    row.appendChild(geoLink);
     const locateBtn = el("button", "chk-locate", "⌖");
     locateBtn.title = t("locateTitle");
     locateBtn.addEventListener("click", (ev) => {

@@ -36,6 +36,7 @@ ${statusChipRules}
 .chk-row.chk-selected { background: #e0efff; }
 .chk-row-meta { color: #888; flex: 1; }
 .chk-locate { font-size: 13px; line-height: 1; padding: 0 5px; }
+a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3px; padding: 0 5px; color: #1a73e8; background: #fff; }
 .chk-settings summary { cursor: pointer; font-weight: bold; margin: 4px 0; }
 .chk-settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; margin: 4px 0; }
 .chk-settings label { display: flex; align-items: center; gap: 4px; font-weight: normal; }
