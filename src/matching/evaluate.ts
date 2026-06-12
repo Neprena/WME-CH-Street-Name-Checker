@@ -173,7 +173,7 @@ export function evaluateSegment(
 
   // Last chance before NOT_FOUND: one-to-one comparison against the official
   // street under the segment. Resolves cases the set-based lookup dropped as
-  // ambiguous (two stems or two fuzzy candidates) — proximity disambiguates.
+  // ambiguous (two stems or two fuzzy candidates) - proximity disambiguates.
   if (nearest && nearest.distanceM <= NEAR_STREET_M) {
     const level = compareNameToCandidate(currentName, nearest.entry.namePart);
     if (level && level !== "exact") {

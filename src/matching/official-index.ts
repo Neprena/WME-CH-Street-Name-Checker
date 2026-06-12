@@ -160,7 +160,7 @@ export class OfficialIndex {
   /**
    * Way-type mismatch: same stem, different type word ("Chemin de la Guérite"
    * vs official "Route de la Guérite"). Only suggests when every candidate
-   * carries the SAME official name — two officials sharing a stem (e.g.
+   * carries the SAME official name - two officials sharing a stem (e.g.
    * "Rue du Moulin" and "Route du Moulin") stay ambiguous and unmatched.
    */
   private stemLookup(name: string, locality?: string): MatchResult | null {

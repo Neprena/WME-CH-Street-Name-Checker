@@ -89,7 +89,7 @@ interface GeoJsonLike {
 /**
  * Extract line geometries (street axes). Real register data mixes
  * MultiLineString, GeometryCollection of MultiLineStrings, and MultiPolygon
- * (named areas) — polygons are dropped on purpose.
+ * (named areas) - polygons are dropped on purpose.
  */
 export function extractLines(geometry: unknown): number[][][] | null {
   const g = geometry as GeoJsonLike | undefined;

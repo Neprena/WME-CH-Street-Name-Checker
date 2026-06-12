@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.1.3] - 2026-06-12
+
+### Changed
+- Typography cleanup: em dashes removed from every UI string and document (the name-normalization regex keeps handling them in street names, on purpose).
+
 ## [1.1.2] - 2026-06-12
 
 ### Fixed

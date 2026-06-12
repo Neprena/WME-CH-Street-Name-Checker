@@ -307,7 +307,7 @@ export class TabUI {
     if (noteText) {
       names.appendChild(el("span", "chk-note", ` (${noteText})`));
     }
-    names.title = `${group.status}${noteText ? ` — ${noteText}` : ""}`;
+    names.title = `${group.status}${noteText ? ` · ${noteText}` : ""}`;
 
     const count = el("span", "chk-count", `×${group.issues.length}`);
     header.append(badge, names, count);

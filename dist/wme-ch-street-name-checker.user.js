@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.1.2
+// @version      1.1.3
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -374,7 +374,7 @@
     fixStopped: "Fixed {done}/{total}, then stopped: {error} (segment {id})",
     allMatch: "All street names match ✓",
     legendTitle: "Legend",
-    legendCOSMETIC: "typography only (case, apostrophe, spacing) — dashed line",
+    legendCOSMETIC: "typography only (case, apostrophe, spacing), dashed line",
     legendVARIANT: "abbreviation, missing accent or article; official spelling suggested",
     legendNEAR: "probable typo; one close official name found",
     legendWRONG_TYPE: "different way type (Chemin ↔ Route); unique official name suggested",
@@ -383,7 +383,7 @@
     geometryMatchingTitle: "Enables UNNAMED suggestions, wrong-street detection and disambiguation by distance",
     legendWRONG_CITY: "name exists, but in another locality (city scoping)",
     legendNOT_FOUND: "not found in the official register",
-    legendUNNAMED: "checked road type without a street name — dashed line",
+    legendUNNAMED: "checked road type without a street name, dashed line",
     legendMICRO_SEGMENT: "drivable segment shorter than 5 m (Swiss guideline; roundabouts excluded)",
     legendLOOP: "loop made of fewer than 3 segments (same endpoints); split it",
     legendNARROW_MISUSE: "Narrow Street misuse: one-way or shorter than 50 m",
@@ -449,7 +449,7 @@
     fixStopped: "{done}/{total} corrigés, puis arrêt: {error} (segment {id})",
     allMatch: "Tous les noms de rues correspondent ✓",
     legendTitle: "Légende",
-    legendCOSMETIC: "typographie uniquement (casse, apostrophe, espaces) — trait pointillé",
+    legendCOSMETIC: "typographie uniquement (casse, apostrophe, espaces), trait pointillé",
     legendVARIANT: "abréviation, accent ou article manquant; orthographe officielle proposée",
     legendNEAR: "faute de frappe probable; un seul nom officiel proche",
     legendWRONG_TYPE: "type de voie différent (Chemin ↔ Route); nom officiel unique proposé",
@@ -458,7 +458,7 @@
     geometryMatchingTitle: "Active les suggestions UNNAMED, la détection de mauvaise rue et la désambiguïsation par distance",
     legendWRONG_CITY: "le nom existe, mais dans une autre localité (scoping)",
     legendNOT_FOUND: "introuvable dans le répertoire officiel",
-    legendUNNAMED: "type de route vérifié sans nom — trait pointillé",
+    legendUNNAMED: "type de route vérifié sans nom, trait pointillé",
     legendMICRO_SEGMENT: "segment carrossable de moins de 5 m (règle suisse; ronds-points exclus)",
     legendLOOP: "boucle de moins de 3 segments (nœuds identiques); à diviser",
     legendNARROW_MISUSE: "Rue étroite mal utilisée: sens unique ou moins de 50 m",
@@ -524,7 +524,7 @@
     fixStopped: "{done}/{total} korrigiert, dann gestoppt: {error} (Segment {id})",
     allMatch: "Alle Strassennamen stimmen überein ✓",
     legendTitle: "Legende",
-    legendCOSMETIC: "nur Typografie (Gross-/Kleinschreibung, Apostroph, Leerzeichen) — gestrichelt",
+    legendCOSMETIC: "nur Typografie (Gross-/Kleinschreibung, Apostroph, Leerzeichen), gestrichelt",
     legendVARIANT: "Abkürzung, fehlender Akzent oder Artikel; amtliche Schreibweise vorgeschlagen",
     legendNEAR: "wahrscheinlicher Tippfehler; ein einziger naher amtlicher Name",
     legendWRONG_TYPE: "anderer Strassentyp (Weg ↔ Strasse); eindeutiger amtlicher Name vorgeschlagen",
@@ -533,7 +533,7 @@
     geometryMatchingTitle: "Aktiviert UNNAMED-Vorschläge, Falsche-Strasse-Erkennung und Distanz-Disambiguierung",
     legendWRONG_CITY: "Name existiert, aber in einer anderen Ortschaft (Scoping)",
     legendNOT_FOUND: "nicht im amtlichen Verzeichnis",
-    legendUNNAMED: "geprüfter Strassentyp ohne Namen — gestrichelt",
+    legendUNNAMED: "geprüfter Strassentyp ohne Namen, gestrichelt",
     legendMICRO_SEGMENT: "befahrbares Segment kürzer als 5 m (Schweizer Regel; Kreisel ausgenommen)",
     legendLOOP: "Schleife aus weniger als 3 Segmenten (gleiche Endknoten); aufteilen",
     legendNARROW_MISUSE: "Falsch verwendete enge Strasse: Einbahn oder kürzer als 50 m",
@@ -599,7 +599,7 @@
     fixStopped: "{done}/{total} corretti, poi interrotto: {error} (segmento {id})",
     allMatch: "Tutti i nomi delle strade corrispondono ✓",
     legendTitle: "Legenda",
-    legendCOSMETIC: "solo tipografia (maiuscole, apostrofo, spazi) — linea tratteggiata",
+    legendCOSMETIC: "solo tipografia (maiuscole, apostrofo, spazi), linea tratteggiata",
     legendVARIANT: "abbreviazione, accento o articolo mancante; proposta la grafia ufficiale",
     legendNEAR: "probabile errore di battitura; un solo nome ufficiale vicino",
     legendWRONG_TYPE: "tipo di via diverso (Chemin ↔ Route); proposto il nome ufficiale unico",
@@ -608,7 +608,7 @@
     geometryMatchingTitle: "Attiva i suggerimenti UNNAMED, il rilevamento di strada errata e la disambiguazione per distanza",
     legendWRONG_CITY: "il nome esiste, ma in un'altra località (scoping)",
     legendNOT_FOUND: "non presente nel repertorio ufficiale",
-    legendUNNAMED: "tipo di strada verificato senza nome — linea tratteggiata",
+    legendUNNAMED: "tipo di strada verificato senza nome, linea tratteggiata",
     legendMICRO_SEGMENT: "segmento percorribile più corto di 5 m (regola svizzera; rotatorie escluse)",
     legendLOOP: "anello con meno di 3 segmenti (stessi nodi); da dividere",
     legendNARROW_MISUSE: "Strada stretta usata male: senso unico o meno di 50 m",
@@ -1157,7 +1157,7 @@
     /**
      * Way-type mismatch: same stem, different type word ("Chemin de la Guérite"
      * vs official "Route de la Guérite"). Only suggests when every candidate
-     * carries the SAME official name — two officials sharing a stem (e.g.
+     * carries the SAME official name - two officials sharing a stem (e.g.
      * "Rue du Moulin" and "Route du Moulin") stay ambiguous and unmatched.
      */
     stemLookup(name, locality) {
@@ -2015,7 +2015,7 @@ ${statusChipRules}
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.1.2"} · `));
+      footer.appendChild(el("span", "chk-muted", `v${"1.1.3"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/wme-ch-street-name-checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2114,7 +2114,7 @@ ${statusChipRules}
       if (noteText) {
         names.appendChild(el("span", "chk-note", ` (${noteText})`));
       }
-      names.title = `${group.status}${noteText ? ` — ${noteText}` : ""}`;
+      names.title = `${group.status}${noteText ? ` · ${noteText}` : ""}`;
       const count = el("span", "chk-count", `×${group.issues.length}`);
       header.append(badge, names, count);
       if (group.fixable && group.issues.length > 1) {
@@ -2567,7 +2567,7 @@ ${statusChipRules}
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.1.2"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.1.3"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();
