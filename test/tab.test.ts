@@ -1,0 +1,58 @@
+import type { LineString } from "geojson";
+import { describe, expect, it } from "vitest";
+import type { Issue, IssueStatus } from "../src/matching/evaluate";
+import { groupIssues } from "../src/ui/tab";
+
+const GEOMETRY: LineString = {
+  type: "LineString",
+  coordinates: [
+    [6.63, 46.52],
+    [6.64, 46.52],
+  ],
+};
+
+let nextId = 1;
+
+function issue(status: IssueStatus, currentName: string): Issue {
+  return {
+    segmentId: nextId++,
+    status,
+    currentName,
+    suggestion: null,
+    note: null,
+    cityId: 1,
+    cityName: "Lausanne",
+    roadType: 1,
+    length: 100,
+    geometry: GEOMETRY,
+    fixable: false,
+  };
+}
+
+describe("groupIssues ordering", () => {
+  it("sorts by severity first, volume second", () => {
+    const issues = [
+      issue("UNNAMED", ""),
+      issue("UNNAMED", ""),
+      issue("UNNAMED", ""),
+      issue("NOT_FOUND", "Espace Quarteron"),
+      issue("COSMETIC", "Aéropole"),
+      issue("VARIANT", "Route des Maréchets"),
+      issue("VARIANT", "Route des Maréchets"),
+      issue("WRONG_STREET", "Belle Ferme"),
+    ];
+    const order = groupIssues(issues).map((g) => g.status);
+    expect(order).toEqual(["COSMETIC", "VARIANT", "WRONG_STREET", "NOT_FOUND", "UNNAMED"]);
+  });
+
+  it("sorts by volume inside the same severity", () => {
+    const issues = [
+      issue("VARIANT", "Petit Groupe"),
+      issue("VARIANT", "Gros Groupe"),
+      issue("VARIANT", "Gros Groupe"),
+      issue("VARIANT", "Gros Groupe"),
+    ];
+    const names = groupIssues(issues).map((g) => g.currentName);
+    expect(names).toEqual(["Gros Groupe", "Petit Groupe"]);
+  });
+});

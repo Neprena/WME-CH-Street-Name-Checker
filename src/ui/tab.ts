@@ -65,7 +65,7 @@ export function formatNote(note: IssueNote | null): string {
   return parts.join(", ");
 }
 
-interface IssueGroup {
+export interface IssueGroup {
   key: string;
   status: IssueStatus;
   currentName: string | null;
@@ -75,7 +75,22 @@ interface IssueGroup {
   issues: Issue[];
 }
 
-function groupIssues(issues: Iterable<Issue>): IssueGroup[] {
+/** Display order: safe fixes first, then risky ones, unnamed and guideline checks last. */
+const SEVERITY_ORDER: Record<IssueStatus, number> = {
+  COSMETIC: 0,
+  VARIANT: 1,
+  NEAR: 2,
+  WRONG_TYPE: 3,
+  WRONG_STREET: 4,
+  WRONG_CITY: 5,
+  NOT_FOUND: 6,
+  UNNAMED: 7,
+  MICRO_SEGMENT: 8,
+  LOOP: 9,
+  NARROW_MISUSE: 10,
+};
+
+export function groupIssues(issues: Iterable<Issue>): IssueGroup[] {
   const groups = new Map<string, IssueGroup>();
   for (const issue of issues) {
     const key = `${issue.status}|${issue.currentName ?? ""}|${issue.suggestion ?? ""}`;
@@ -94,7 +109,9 @@ function groupIssues(issues: Iterable<Issue>): IssueGroup[] {
     }
     group.issues.push(issue);
   }
-  return [...groups.values()].sort((a, b) => b.issues.length - a.issues.length);
+  return [...groups.values()].sort(
+    (a, b) => SEVERITY_ORDER[a.status] - SEVERITY_ORDER[b.status] || b.issues.length - a.issues.length,
+  );
 }
 
 export class TabUI {
@@ -247,9 +264,11 @@ export class TabUI {
     this.lastRenderedIssues = issues;
 
     const visible = this.visibleIssues(issues);
-    this.orderedIssueIds = visible.map((i) => i.segmentId);
+    const groups = groupIssues(visible);
+    // "next issue" follows the displayed order (severity, then volume)
+    this.orderedIssueIds = groups.flatMap((g) => g.issues.map((i) => i.segmentId));
     this.renderChips(issues);
-    this.renderGroups(visible, state);
+    this.renderGroups(groups, visible.length, state);
   }
 
   private visibleIssues(issues: ReadonlyMap<number, Issue>): Issue[] {
@@ -284,9 +303,13 @@ export class TabUI {
     }
   }
 
-  private renderGroups(visible: Issue[], state: ScanSnapshot["state"]): void {
+  private renderGroups(
+    groups: IssueGroup[],
+    visibleCount: number,
+    state: ScanSnapshot["state"],
+  ): void {
     this.groupsBox.replaceChildren();
-    if (visible.length === 0) {
+    if (visibleCount === 0) {
       if (state === "done") {
         this.groupsBox.appendChild(el("div", "chk-empty", t("allMatch")));
       } else if (state === "zoom-gated" || state === "area-gated") {
@@ -294,7 +317,7 @@ export class TabUI {
       }
       return;
     }
-    for (const group of groupIssues(visible)) {
+    for (const group of groups) {
       this.groupsBox.appendChild(this.renderGroup(group));
     }
   }

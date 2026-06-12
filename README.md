@@ -19,7 +19,7 @@ Compare les noms de rues des segments visibles avec le **répertoire officiel de
 
 - Scan automatique du viewport (debounce, zoom minimum, cache de tuiles, max 30 req/min - conforme au fair use FSDI de 40 req/min).
 - Surlignage des segments sur la carte, couleur par statut (tableau ci-dessous).
-- Onglet latéral **CH Names**: compteurs filtrables, liste groupée par `nom actuel → nom officiel`, clic = sélection du segment, bouton ⌖ = centrer la carte, bouton "Écart suivant".
+- Onglet latéral **CH Names**: compteurs filtrables, liste groupée par `nom actuel → nom officiel` triée par sévérité puis volume, clic sur un groupe = zoom sur le secteur, clic sur une ligne = sélection du segment, bouton ⌖ = centrer la carte, bouton "Écart suivant".
 - Encadré dans le panneau d'édition: à la sélection d'un segment, verdict du scan (statut, explication, suggestion) avec boutons Corriger / Tout corriger (désactivable).
 - Interrupteurs en tête d'onglet: "Actif" (coupe tout: scan, couche, encadré) et "Scan auto" (désactivé = scan manuel via Rescanner). Décocher la couche masque aussi l'encadré.
 - Raccourcis clavier (remappables dans les réglages WME): Alt+N = écart suivant, Alt+F = corriger le segment sélectionné. Cache persistant (IndexedDB): les zones scannées survivent au rechargement de WME pendant 24 h.
@@ -64,7 +64,7 @@ Vergleicht die Strassennamen der sichtbaren Segmente mit dem **amtlichen Strasse
 
 - Automatischer Scan des Kartenausschnitts (Debounce, Mindestzoom, Kachel-Cache, max. 30 Anfragen/Min. - innerhalb der BGDI-Fair-Use-Grenze von 40/Min.).
 - Farbliche Hervorhebung der Segmente auf der Karte, Farbe je Status (Tabelle unten).
-- Seitentab **CH Names**: filterbare Zähler, gruppierte Liste `aktueller Name → amtlicher Name`, Klick = Segment auswählen, ⌖ = Karte zentrieren, "Nächste Abweichung".
+- Seitentab **CH Names**: filterbare Zähler, gruppierte Liste `aktueller Name → amtlicher Name` sortiert nach Schweregrad und Anzahl, Klick auf eine Gruppe = Zoom auf das Gebiet, Klick auf eine Zeile = Segment auswählen, ⌖ = Karte zentrieren, "Nächste Abweichung".
 - Box im Bearbeitungspanel: bei Auswahl eines Segments erscheint das Scan-Ergebnis (Status, Erklärung, Vorschlag) mit Korrigieren / Alle korrigieren (abschaltbar).
 - Hauptschalter oben im Tab: "Aktiv" (deaktiviert alles) und "Auto-Scan" (aus = nur manuell per Neu scannen). Eine deaktivierte Ebene blendet auch die Box aus.
 - Tastaturkürzel (in den WME-Einstellungen anpassbar): Alt+N = nächste Abweichung, Alt+F = ausgewähltes Segment korrigieren. Persistenter Cache (IndexedDB): gescannte Gebiete überleben einen WME-Reload 24 h lang.
@@ -109,7 +109,7 @@ Confronta i nomi delle strade dei segmenti visibili con il **repertorio ufficial
 
 - Scansione automatica della vista (debounce, zoom minimo, cache a tessere, max 30 richieste/min - entro il fair use IFDG di 40/min).
 - Evidenziazione dei segmenti sulla mappa, colore per stato (tabella sotto).
-- Scheda laterale **CH Names**: contatori filtrabili, elenco raggruppato `nome attuale → nome ufficiale`, clic = seleziona il segmento, ⌖ = centra la mappa, "Prossima differenza".
+- Scheda laterale **CH Names**: contatori filtrabili, elenco raggruppato `nome attuale → nome ufficiale` ordinato per gravità e volume, clic su un gruppo = zoom sulla zona, clic su una riga = seleziona il segmento, ⌖ = centra la mappa, "Prossima differenza".
 - Riquadro nel pannello di modifica: selezionando un segmento appare il verdetto della scansione (stato, spiegazione, proposta) con Correggi / Correggi tutti (disattivabile).
 - Interruttori in cima alla scheda: "Attivo" (disattiva tutto) e "Scansione auto" (off = solo manuale con Riscansiona). Nascondere il livello nasconde anche il riquadro.
 - Scorciatoie da tastiera (rimappabili nelle impostazioni WME): Alt+N = prossima differenza, Alt+F = correggi il segmento selezionato. Cache persistente (IndexedDB): le zone scansionate sopravvivono al ricaricamento di WME per 24 h.
@@ -154,7 +154,7 @@ Compares the street names of visible segments with the Swiss federal **official 
 
 - Automatic viewport scan (debounce, minimum zoom, tile cache, max 30 req/min - within the FSDI fair-use limit of 40/min).
 - Map highlighting of segments, one color per status (table below).
-- **CH Names** sidebar tab: filterable counters, list grouped by `current name → official name`, click = select the segment, ⌖ = center the map, "Next issue".
+- **CH Names** sidebar tab: filterable counters, list grouped by `current name → official name` sorted by severity then volume, click a group = zoom to the area, click a row = select the segment, ⌖ = center the map, "Next issue".
 - Box in the edit panel: selecting a segment shows the scan verdict (status, explanation, suggestion) with Fix / Fix all buttons (toggleable).
 - Master toggles at the top of the tab: "Enabled" (turns everything off) and "Auto scan" (off = manual Rescan only). Unchecking the layer also hides the box.
 - Keyboard shortcuts (remappable in the WME settings): Alt+N = next issue, Alt+F = fix the selected segment. Persistent cache (IndexedDB): scanned areas survive a WME reload for 24 h.

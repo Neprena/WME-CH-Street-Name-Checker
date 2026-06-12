@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.4.0] - 2026-06-12
+
+### Changed
+- The sidebar list is now sorted by severity then volume: safe fixes first (COSMETIC, VARIANT), then NEAR and WRONG_TYPE, then WRONG_STREET/WRONG_CITY/NOT_FOUND, UNNAMED and guideline checks last. "Next issue" follows the same order.
+
 ## [1.3.1] - 2026-06-12
 
 ### Added

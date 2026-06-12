@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.3.1
+// @version      1.4.0
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -2011,6 +2011,19 @@ ${statusChipRules}
     if (note.existsIn) parts.push(t("noteExistsIn", { place: note.existsIn }));
     return parts.join(", ");
   }
+  var SEVERITY_ORDER = {
+    COSMETIC: 0,
+    VARIANT: 1,
+    NEAR: 2,
+    WRONG_TYPE: 3,
+    WRONG_STREET: 4,
+    WRONG_CITY: 5,
+    NOT_FOUND: 6,
+    UNNAMED: 7,
+    MICRO_SEGMENT: 8,
+    LOOP: 9,
+    NARROW_MISUSE: 10
+  };
   function groupIssues(issues) {
     const groups = /* @__PURE__ */ new Map();
     for (const issue of issues) {
@@ -2030,7 +2043,9 @@ ${statusChipRules}
       }
       group.issues.push(issue);
     }
-    return [...groups.values()].sort((a, b) => b.issues.length - a.issues.length);
+    return [...groups.values()].sort(
+      (a, b) => SEVERITY_ORDER[a.status] - SEVERITY_ORDER[b.status] || b.issues.length - a.issues.length
+    );
   }
   var TabUI = class {
     constructor(sdk2, scanner, settings) {
@@ -2126,7 +2141,7 @@ ${statusChipRules}
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.3.1"} · `));
+      footer.appendChild(el("span", "chk-muted", `v${"1.4.0"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/WME-CH-Street-Name-Checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2164,9 +2179,10 @@ ${statusChipRules}
       if (!force && issues === this.lastRenderedIssues) return;
       this.lastRenderedIssues = issues;
       const visible = this.visibleIssues(issues);
-      this.orderedIssueIds = visible.map((i) => i.segmentId);
+      const groups = groupIssues(visible);
+      this.orderedIssueIds = groups.flatMap((g) => g.issues.map((i) => i.segmentId));
       this.renderChips(issues);
-      this.renderGroups(visible, state);
+      this.renderGroups(groups, visible.length, state);
     }
     visibleIssues(issues) {
       const settings = this.settings.get();
@@ -2198,9 +2214,9 @@ ${statusChipRules}
         this.chipsBox.appendChild(chip);
       }
     }
-    renderGroups(visible, state) {
+    renderGroups(groups, visibleCount, state) {
       this.groupsBox.replaceChildren();
-      if (visible.length === 0) {
+      if (visibleCount === 0) {
         if (state === "done") {
           this.groupsBox.appendChild(el("div", "chk-empty", t("allMatch")));
         } else if (state === "zoom-gated" || state === "area-gated") {
@@ -2208,7 +2224,7 @@ ${statusChipRules}
         }
         return;
       }
-      for (const group of groupIssues(visible)) {
+      for (const group of groups) {
         this.groupsBox.appendChild(this.renderGroup(group));
       }
     }
@@ -2718,7 +2734,7 @@ ${statusChipRules}
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.3.1"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.4.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();
