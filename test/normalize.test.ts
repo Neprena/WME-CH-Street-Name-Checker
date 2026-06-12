@@ -60,6 +60,11 @@ describe("stemKey", () => {
     expect(stemKey("avenue du general guisan")).toBe("general guisan");
   });
 
+  it("strips multi-word way types", () => {
+    expect(stemKey("zone industrielle la palaz a")).toBe("palaz a");
+    expect(stemKey("zone artisanale du vivier")).toBe("vivier");
+  });
+
   it("strips German glued suffixes", () => {
     expect(stemKey("bahnhofstrasse")).toBe("bahnhof");
     expect(stemKey("bahnhofweg")).toBe("bahnhof");

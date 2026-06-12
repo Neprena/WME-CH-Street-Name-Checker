@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.5.1] - 2026-06-12
+
+### Fixed
+- Bare names whose official form carries a multi-word way type were NOT_FOUND (real case: "La Palaz A" vs official "Zone Industrielle La Palaz A" in Payerne). "Zone industrielle/artisanale/commerciale" and Italian "zona industriale/artigianale" now count as way-type prefixes for stem matching.
+
 ## [1.5.0] - 2026-06-12
 
 ### Added

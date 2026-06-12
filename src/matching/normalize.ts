@@ -105,6 +105,15 @@ const WAY_TYPE_WORDS = new Set([
 /** German way-type suffixes glued to single-token names (Bahnhofstrasse / Bahnhofweg). */
 const GERMAN_SUFFIXES = /^(.{4,}?)(strasse|weg|gasse|platz)$/;
 
+/** Multi-word way types ("Zone Industrielle La Palaz A" -> stem "palaz a"). */
+const MULTI_WAY_TYPE_PREFIXES: string[][] = [
+  ["zone", "industrielle"],
+  ["zone", "artisanale"],
+  ["zone", "commerciale"],
+  ["zona", "industriale"],
+  ["zona", "artigianale"],
+];
+
 /**
  * Stem of a K2 key: the name without its way-type word and without articles.
  * "chemin de la guerite" -> "guerite"; "bahnhofweg" -> "bahnhof".
@@ -114,7 +123,13 @@ export function stemKey(key: string): string | null {
   const tokens = key.split(" ");
   let rest: string[] | null = null;
   const first = tokens[0];
-  if (tokens.length >= 2 && first !== undefined && WAY_TYPE_WORDS.has(first)) {
+  for (const prefix of MULTI_WAY_TYPE_PREFIXES) {
+    if (tokens.length > prefix.length && prefix.every((word, i) => tokens[i] === word)) {
+      rest = tokens.slice(prefix.length);
+      break;
+    }
+  }
+  if (!rest && tokens.length >= 2 && first !== undefined && WAY_TYPE_WORDS.has(first)) {
     rest = tokens.slice(1);
   } else if (tokens.length === 1 && first !== undefined) {
     const m = first.match(GERMAN_SUFFIXES);

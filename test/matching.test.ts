@@ -153,6 +153,16 @@ describe("way-type stem matching (WRONG_TYPE)", () => {
     expect(m?.entry.namePart).toBe("Rue Vers-chez-Cherbuin");
   });
 
+  it("matches a bare name against a multi-word way type official", () => {
+    const local = new OfficialIndex([
+      makeOfficial("Zone Industrielle La Palaz A", { zipLabel: "1530 Payerne" }),
+      makeOfficial("Zone Industrielle La Palaz B", { zipLabel: "1530 Payerne" }),
+    ]);
+    const m = local.lookup("La Palaz A");
+    expect(m?.level).toBe("stem");
+    expect(m?.entry.namePart).toBe("Zone Industrielle La Palaz A");
+  });
+
   it("matches a bare name with articles against the typed official name", () => {
     const local = new OfficialIndex([makeOfficial("Route de la Bricoleta")]);
     const m = local.lookup("La Bricoleta");

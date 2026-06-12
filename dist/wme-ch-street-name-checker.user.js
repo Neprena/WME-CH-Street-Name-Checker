@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.5.0
+// @version      1.5.1
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -1000,11 +1000,24 @@
     "riva"
   ]);
   var GERMAN_SUFFIXES = /^(.{4,}?)(strasse|weg|gasse|platz)$/;
+  var MULTI_WAY_TYPE_PREFIXES = [
+    ["zone", "industrielle"],
+    ["zone", "artisanale"],
+    ["zone", "commerciale"],
+    ["zona", "industriale"],
+    ["zona", "artigianale"]
+  ];
   function stemKey(key) {
     const tokens = key.split(" ");
     let rest = null;
     const first = tokens[0];
-    if (tokens.length >= 2 && first !== void 0 && WAY_TYPE_WORDS.has(first)) {
+    for (const prefix of MULTI_WAY_TYPE_PREFIXES) {
+      if (tokens.length > prefix.length && prefix.every((word, i) => tokens[i] === word)) {
+        rest = tokens.slice(prefix.length);
+        break;
+      }
+    }
+    if (!rest && tokens.length >= 2 && first !== void 0 && WAY_TYPE_WORDS.has(first)) {
       rest = tokens.slice(1);
     } else if (tokens.length === 1 && first !== void 0) {
       const m = first.match(GERMAN_SUFFIXES);
@@ -2167,7 +2180,7 @@ ${statusChipRules}
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.5.0"} · `));
+      footer.appendChild(el("span", "chk-muted", `v${"1.5.1"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/WME-CH-Street-Name-Checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2775,7 +2788,7 @@ ${statusChipRules}
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.5.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.5.1"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();
