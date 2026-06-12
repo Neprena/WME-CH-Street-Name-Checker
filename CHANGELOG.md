@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.7.0] - 2026-06-12
+
+### Added
+- Outside Switzerland the script now stays completely silent ("Outside Switzerland" state, no API calls) instead of flagging everything NOT_FOUND. In border viewports, segments whose country is not Switzerland are skipped by the name checks and the Swiss guideline checks alike.
+
 ## [1.6.2] - 2026-06-12
 
 ### Fixed

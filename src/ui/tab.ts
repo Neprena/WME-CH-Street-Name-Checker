@@ -35,6 +35,7 @@ export const LEGEND_KEYS: Record<IssueStatus, StringKey> = {
 export const STATE_KEYS: Record<ScanSnapshot["state"], StringKey> = {
   idle: "stateIdle",
   disabled: "stateDisabled",
+  "outside-ch": "stateOutsideCh",
   "zoom-gated": "stateZoomGated",
   "area-gated": "stateAreaGated",
   fetching: "stateFetching",

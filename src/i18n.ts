@@ -4,6 +4,7 @@ export type LanguagePreference = "auto" | LocaleCode;
 const en = {
   stateIdle: "Idle",
   stateDisabled: "Script disabled",
+  stateOutsideCh: "Outside Switzerland",
   toggleEnabled: "Enabled",
   toggleEnabledTitle: "Master switch: off disables scanning, the map layer and the edit-panel box",
   toggleAutoScan: "Auto scan",
@@ -84,6 +85,7 @@ export type StringKey = keyof typeof en;
 const fr: Record<StringKey, string> = {
   stateIdle: "En attente",
   stateDisabled: "Script désactivé",
+  stateOutsideCh: "Hors de Suisse",
   toggleEnabled: "Actif",
   toggleEnabledTitle: "Interrupteur général: désactive le scan, la couche carte et l'encadré du panneau",
   toggleAutoScan: "Scan auto",
@@ -162,6 +164,7 @@ const fr: Record<StringKey, string> = {
 const de: Record<StringKey, string> = {
   stateIdle: "Bereit",
   stateDisabled: "Skript deaktiviert",
+  stateOutsideCh: "Ausserhalb der Schweiz",
   toggleEnabled: "Aktiv",
   toggleEnabledTitle: "Hauptschalter: deaktiviert Scan, Kartenebene und Panel-Box",
   toggleAutoScan: "Auto-Scan",
@@ -240,6 +243,7 @@ const de: Record<StringKey, string> = {
 const it: Record<StringKey, string> = {
   stateIdle: "In attesa",
   stateDisabled: "Script disattivato",
+  stateOutsideCh: "Fuori dalla Svizzera",
   toggleEnabled: "Attivo",
   toggleEnabledTitle: "Interruttore generale: disattiva scansione, livello mappa e riquadro del pannello",
   toggleAutoScan: "Scansione auto",

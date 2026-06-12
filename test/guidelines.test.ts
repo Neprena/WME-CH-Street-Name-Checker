@@ -33,6 +33,8 @@ function seg(overrides: Partial<Segment> = {}): Segment {
 }
 
 const noAddress = (): SegmentAddress | null => null;
+const frenchAddress = (): SegmentAddress | null =>
+  ({ street: null, city: null, state: null, country: { id: 2, abbr: "FR", name: "France" }, isEmpty: true, altStreets: [] }) as unknown as SegmentAddress;
 
 function statusOf(issues: ReturnType<typeof evaluateGuidelines>, segmentId: number): IssueStatus | undefined {
   return issues.find((i) => i.segmentId === segmentId)?.status;
@@ -57,6 +59,13 @@ describe("MICRO_SEGMENT", () => {
   it("ignores segments of 5 m and more", () => {
     const s = seg({ length: 5 } as Partial<Segment>);
     expect(evaluateGuidelines([s], noAddress)).toHaveLength(0);
+  });
+});
+
+describe("country guard", () => {
+  it("ignores foreign segments in border viewports", () => {
+    const s = seg({ length: 3 } as Partial<Segment>);
+    expect(evaluateGuidelines([s], frenchAddress)).toHaveLength(0);
   });
 });
 

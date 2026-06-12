@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.6.2
+// @version      1.7.0
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -360,6 +360,7 @@
   var en = {
     stateIdle: "Idle",
     stateDisabled: "Script disabled",
+    stateOutsideCh: "Outside Switzerland",
     toggleEnabled: "Enabled",
     toggleEnabledTitle: "Master switch: off disables scanning, the map layer and the edit-panel box",
     toggleAutoScan: "Auto scan",
@@ -436,6 +437,7 @@
   var fr = {
     stateIdle: "En attente",
     stateDisabled: "Script désactivé",
+    stateOutsideCh: "Hors de Suisse",
     toggleEnabled: "Actif",
     toggleEnabledTitle: "Interrupteur général: désactive le scan, la couche carte et l'encadré du panneau",
     toggleAutoScan: "Scan auto",
@@ -512,6 +514,7 @@
   var de = {
     stateIdle: "Bereit",
     stateDisabled: "Skript deaktiviert",
+    stateOutsideCh: "Ausserhalb der Schweiz",
     toggleEnabled: "Aktiv",
     toggleEnabledTitle: "Hauptschalter: deaktiviert Scan, Kartenebene und Panel-Box",
     toggleAutoScan: "Auto-Scan",
@@ -588,6 +591,7 @@
   var it = {
     stateIdle: "In attesa",
     stateDisabled: "Script disattivato",
+    stateOutsideCh: "Fuori dalla Svizzera",
     toggleEnabled: "Attivo",
     toggleEnabledTitle: "Interruttore generale: disattiva scansione, livello mappa e riquadro del pannello",
     toggleAutoScan: "Scansione auto",
@@ -851,6 +855,7 @@
   var DRIVABLE_TYPES = /* @__PURE__ */ new Set([1, 2, 3, 4, 6, 7, 8, 17, 20, 22]);
   function makeIssue(segment, status, getAddress) {
     const address = getAddress(segment.id);
+    if (address?.country && address.country.abbr !== "CH") return null;
     return {
       segmentId: segment.id,
       status,
@@ -875,16 +880,19 @@
       if (!DRIVABLE_TYPES.has(segment.roadType)) continue;
       const isRoundabout = segment.junctionId !== null;
       if (!isRoundabout && segment.length < MIN_SEGMENT_LENGTH_M) {
-        issues.set(segment.id, makeIssue(segment, "MICRO_SEGMENT", getAddress));
+        const issue = makeIssue(segment, "MICRO_SEGMENT", getAddress);
+        if (issue) issues.set(segment.id, issue);
       }
       if (segment.roadType === NARROW_STREET_TYPE && (isOneWay(segment) || segment.length < MIN_NARROW_STREET_LENGTH_M)) {
         if (!issues.has(segment.id)) {
-          issues.set(segment.id, makeIssue(segment, "NARROW_MISUSE", getAddress));
+          const issue = makeIssue(segment, "NARROW_MISUSE", getAddress);
+          if (issue) issues.set(segment.id, issue);
         }
       }
       if (isRoundabout || segment.fromNodeId === null || segment.toNodeId === null) continue;
       if (segment.fromNodeId === segment.toNodeId) {
-        issues.set(segment.id, makeIssue(segment, "LOOP", getAddress));
+        const issue = makeIssue(segment, "LOOP", getAddress);
+        if (issue) issues.set(segment.id, issue);
         continue;
       }
       const a = Math.min(segment.fromNodeId, segment.toNodeId);
@@ -897,7 +905,8 @@
     for (const pair of byNodePair.values()) {
       if (pair.length < 2) continue;
       for (const segment of pair) {
-        issues.set(segment.id, makeIssue(segment, "LOOP", getAddress));
+        const issue = makeIssue(segment, "LOOP", getAddress);
+        if (issue) issues.set(segment.id, issue);
       }
     }
     return [...issues.values()];
@@ -1469,6 +1478,7 @@
   }
   function evaluateSegment(segment, address, index, settings, nearest = null) {
     if (!settings.checkedRoadTypes.includes(segment.roadType)) return { kind: "skipped" };
+    if (address.country && address.country.abbr !== "CH") return { kind: "skipped" };
     const currentName = address.street?.name?.trim() || null;
     const baseIssue = {
       segmentId: segment.id,
@@ -1593,6 +1603,10 @@
   }
 
   // src/scan.ts
+  var CH_BBOX = [5.9, 45.8, 10.6, 47.9];
+  function intersectsSwitzerland(bbox) {
+    return bbox[0] <= CH_BBOX[2] && bbox[2] >= CH_BBOX[0] && bbox[1] <= CH_BBOX[3] && bbox[3] >= CH_BBOX[1];
+  }
   var DEBOUNCE_MS = 800;
   var BBOX_PADDING_RATIO = 0.2;
   var MAX_AREA_KM2 = 6;
@@ -1733,6 +1747,10 @@
           return;
         }
         const bbox = padBbox(this.sdk.Map.getMapExtent());
+        if (!intersectsSwitzerland(bbox)) {
+          this.publish({ state: "outside-ch", issues: /* @__PURE__ */ new Map(), progress: null });
+          return;
+        }
         if (bboxAreaKm2(bbox) > MAX_AREA_KM2) {
           this.publish({ state: "area-gated", issues: /* @__PURE__ */ new Map(), progress: null });
           return;
@@ -2095,6 +2113,7 @@ ${statusChipRules}
   var STATE_KEYS = {
     idle: "stateIdle",
     disabled: "stateDisabled",
+    "outside-ch": "stateOutsideCh",
     "zoom-gated": "stateZoomGated",
     "area-gated": "stateAreaGated",
     fetching: "stateFetching",
@@ -2249,7 +2268,7 @@ ${statusChipRules}
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.6.2"} · `));
+      footer.appendChild(el("span", "chk-muted", `v${"1.7.0"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/WME-CH-Street-Name-Checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2865,7 +2884,7 @@ ${statusChipRules}
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.6.2"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.7.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();

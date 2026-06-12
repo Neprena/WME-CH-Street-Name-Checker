@@ -81,6 +81,8 @@ export function evaluateSegment(
   nearest: NearestResult | null = null,
 ): Verdict {
   if (!settings.checkedRoadTypes.includes(segment.roadType)) return { kind: "skipped" };
+  // the register only covers Switzerland; foreign segments in border viewports are ignored
+  if (address.country && address.country.abbr !== "CH") return { kind: "skipped" };
 
   const currentName = address.street?.name?.trim() || null;
   const baseIssue = {

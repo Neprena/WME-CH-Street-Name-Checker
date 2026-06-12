@@ -17,7 +17,7 @@ Compare les noms de rues des segments visibles avec le **répertoire officiel de
 
 ## Fonctionnalités
 
-- Scan automatique du viewport (debounce, zoom minimum, cache de tuiles, max 30 req/min - conforme au fair use FSDI de 40 req/min).
+- Scan automatique du viewport (debounce, zoom minimum, cache de tuiles, max 30 req/min - conforme au fair use FSDI de 40 req/min). Hors de Suisse: script inactif, zéro requête; en zone frontalière, les segments étrangers sont ignorés.
 - Surlignage des segments sur la carte, couleur par statut (tableau ci-dessous).
 - Onglet latéral **CH Names**: compteurs filtrables, liste groupée par `nom actuel → nom officiel` triée par sévérité puis volume, clic sur un groupe = zoom sur le secteur, clic sur une ligne = sélection du segment, bouton ⌖ = centrer la carte, bouton "Écart suivant".
 - Encadré dans le panneau d'édition: à la sélection d'un segment, verdict du scan (statut, explication, suggestion) avec boutons Corriger / Tout corriger (désactivable).
@@ -62,7 +62,7 @@ Vergleicht die Strassennamen der sichtbaren Segmente mit dem **amtlichen Strasse
 
 ## Funktionen
 
-- Automatischer Scan des Kartenausschnitts (Debounce, Mindestzoom, Kachel-Cache, max. 30 Anfragen/Min. - innerhalb der BGDI-Fair-Use-Grenze von 40/Min.).
+- Automatischer Scan des Kartenausschnitts (Debounce, Mindestzoom, Kachel-Cache, max. 30 Anfragen/Min. - innerhalb der BGDI-Fair-Use-Grenze von 40/Min.). Ausserhalb der Schweiz bleibt das Skript inaktiv; in Grenzgebieten werden ausländische Segmente ignoriert.
 - Farbliche Hervorhebung der Segmente auf der Karte, Farbe je Status (Tabelle unten).
 - Seitentab **CH Names**: filterbare Zähler, gruppierte Liste `aktueller Name → amtlicher Name` sortiert nach Schweregrad und Anzahl, Klick auf eine Gruppe = Zoom auf das Gebiet, Klick auf eine Zeile = Segment auswählen, ⌖ = Karte zentrieren, "Nächste Abweichung".
 - Box im Bearbeitungspanel: bei Auswahl eines Segments erscheint das Scan-Ergebnis (Status, Erklärung, Vorschlag) mit Korrigieren / Alle korrigieren (abschaltbar).
@@ -107,7 +107,7 @@ Confronta i nomi delle strade dei segmenti visibili con il **repertorio ufficial
 
 ## Funzionalità
 
-- Scansione automatica della vista (debounce, zoom minimo, cache a tessere, max 30 richieste/min - entro il fair use IFDG di 40/min).
+- Scansione automatica della vista (debounce, zoom minimo, cache a tessere, max 30 richieste/min - entro il fair use IFDG di 40/min). Fuori dalla Svizzera lo script resta inattivo; nelle zone di confine i segmenti esteri sono ignorati.
 - Evidenziazione dei segmenti sulla mappa, colore per stato (tabella sotto).
 - Scheda laterale **CH Names**: contatori filtrabili, elenco raggruppato `nome attuale → nome ufficiale` ordinato per gravità e volume, clic su un gruppo = zoom sulla zona, clic su una riga = seleziona il segmento, ⌖ = centra la mappa, "Prossima differenza".
 - Riquadro nel pannello di modifica: selezionando un segmento appare il verdetto della scansione (stato, spiegazione, proposta) con Correggi / Correggi tutti (disattivabile).
@@ -152,7 +152,7 @@ Compares the street names of visible segments with the Swiss federal **official 
 
 ## Features
 
-- Automatic viewport scan (debounce, minimum zoom, tile cache, max 30 req/min - within the FSDI fair-use limit of 40/min).
+- Automatic viewport scan (debounce, minimum zoom, tile cache, max 30 req/min - within the FSDI fair-use limit of 40/min). Outside Switzerland the script stays inactive; in border viewports foreign segments are ignored.
 - Map highlighting of segments, one color per status (table below).
 - **CH Names** sidebar tab: filterable counters, list grouped by `current name → official name` sorted by severity then volume, click a group = zoom to the area, click a row = select the segment, ⌖ = center the map, "Next issue".
 - Box in the edit panel: selecting a segment shows the scan verdict (status, explanation, suggestion) with Fix / Fix all buttons (toggleable).

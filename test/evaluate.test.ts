@@ -32,13 +32,14 @@ function makeAddress(
   streetName: string | null,
   altNames: string[] = [],
   cityName: string | null = "Lausanne",
+  countryAbbr = "CH",
 ): SegmentAddress {
   const city = cityName ? { id: 10, name: cityName } : null;
   return {
     street: streetName ? { id: 100, name: streetName } : null,
+    country: { id: 1, abbr: countryAbbr, name: countryAbbr },
     city,
     state: null,
-    country: null,
     isEmpty: streetName === null,
     altStreets: altNames.map((name) => ({
       street: { id: 200, name },
@@ -55,6 +56,16 @@ const index = new OfficialIndex(LAUSANNE_STREETS);
 const settings: Settings = { ...DEFAULT_SETTINGS };
 
 describe("evaluateSegment", () => {
+  it("skips segments outside Switzerland", () => {
+    const v = evaluateSegment(
+      makeSegment(),
+      makeAddress("Rue de la Paix", [], "Pontarlier", "FR"),
+      index,
+      settings,
+    );
+    expect(v.kind).toBe("skipped");
+  });
+
   it("skips unchecked road types", () => {
     const v = evaluateSegment(
       makeSegment({ roadType: 4 } as Partial<Segment>),

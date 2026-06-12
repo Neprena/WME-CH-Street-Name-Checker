@@ -10,6 +10,15 @@ import { distanceToLinesM, nearestOfficial, SpatialIndex } from "./matching/spat
 import { findStreetLinesByName } from "./geoadmin/client";
 import type { SettingsStore } from "./settings";
 
+/** Switzerland bounding box (WGS84), generous margins for border viewports. */
+export const CH_BBOX: Bbox = [5.9, 45.8, 10.6, 47.9];
+
+export function intersectsSwitzerland(bbox: Bbox): boolean {
+  return (
+    bbox[0] <= CH_BBOX[2] && bbox[2] >= CH_BBOX[0] && bbox[1] <= CH_BBOX[3] && bbox[3] >= CH_BBOX[1]
+  );
+}
+
 const DEBOUNCE_MS = 800;
 const BBOX_PADDING_RATIO = 0.2; // covers the WME data-model buffer beyond the viewport
 const MAX_AREA_KM2 = 6;
@@ -24,6 +33,7 @@ const MAX_CONTINUATION_LOOKUPS_PER_RUN = 10;
 export type ScanState =
   | "idle"
   | "disabled"
+  | "outside-ch"
   | "zoom-gated"
   | "area-gated"
   | "fetching"
@@ -195,6 +205,11 @@ export class Scanner {
         return;
       }
       const bbox = padBbox(this.sdk.Map.getMapExtent() as Bbox);
+      if (!intersectsSwitzerland(bbox)) {
+        // abroad: stay silent, no API calls, no noise
+        this.publish({ state: "outside-ch", issues: new Map(), progress: null });
+        return;
+      }
       if (bboxAreaKm2(bbox) > MAX_AREA_KM2) {
         this.publish({ state: "area-gated", issues: new Map(), progress: null });
         return;
