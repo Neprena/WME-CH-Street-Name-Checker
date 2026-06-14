@@ -3,6 +3,12 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.11.0] - 2026-06-14
+
+### Changed
+- The side panel got a full visual and ergonomic refresh. A proper header shows the script name and version, the status line became a tinted banner (neutral while scanning, green when everything matches, red on error), and the "Enabled" / "Auto scan" switches are now iOS-style toggles. The Legend and Settings are collapsible sections with colored icon headers, and the once-dense Settings panel is split into four collapsible sub-sections — checked road types, checked issue types, options, and scope & display — with every boolean option shown as a toggle. Issue cards, filter chips and action buttons were restyled for clarity.
+- The panel now adapts to the Waze Map Editor theme. Colors follow the editor's own light/dark skin, detected at load from the sidebar's actual background, so the panel stays readable in both modes instead of always rendering in light colors (or in dark colors when the operating system preference disagreed with WME).
+
 ## [1.10.0] - 2026-06-14
 
 ### Added

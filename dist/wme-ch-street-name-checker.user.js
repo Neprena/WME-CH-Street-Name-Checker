@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.10.0
+// @version      1.11.0
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -416,6 +416,8 @@
     settingsTitle: "Settings",
     roadTypesLabel: "Checked road types:",
     statusesLabel: "Checked issue types:",
+    optionsLabel: "Options",
+    scopeDisplayLabel: "Scope & display",
     altOk: "Alternate name match counts as OK",
     altOkTitle: "Useful in bilingual communes where the second language is an alternate name",
     showMapLabels: "Show expected name on the map (zoom ≥ 17)",
@@ -496,6 +498,8 @@
     settingsTitle: "Réglages",
     roadTypesLabel: "Types de routes vérifiés:",
     statusesLabel: "Types d'erreurs vérifiés:",
+    optionsLabel: "Options",
+    scopeDisplayLabel: "Portée & affichage",
     altOk: "Nom alternatif correspondant = OK",
     altOkTitle: "Utile dans les communes bilingues où la seconde langue est en nom alternatif",
     showMapLabels: "Afficher le nom attendu sur la carte (zoom ≥ 17)",
@@ -576,6 +580,8 @@
     settingsTitle: "Einstellungen",
     roadTypesLabel: "Geprüfte Strassentypen:",
     statusesLabel: "Geprüfte Fehlertypen:",
+    optionsLabel: "Optionen",
+    scopeDisplayLabel: "Geltungsbereich & Anzeige",
     altOk: "Alternativname zählt als OK",
     altOkTitle: "Nützlich in zweisprachigen Gemeinden mit der zweiten Sprache als Alternativname",
     showMapLabels: "Erwarteten Namen auf der Karte anzeigen (Zoom ≥ 17)",
@@ -656,6 +662,8 @@
     settingsTitle: "Impostazioni",
     roadTypesLabel: "Tipi di strada verificati:",
     statusesLabel: "Tipi di errore verificati:",
+    optionsLabel: "Opzioni",
+    scopeDisplayLabel: "Ambito e visualizzazione",
     altOk: "Nome alternativo corrispondente = OK",
     altOkTitle: "Utile nei comuni bilingui con la seconda lingua come nome alternativo",
     showMapLabels: "Mostra il nome atteso sulla mappa (zoom ≥ 17)",
@@ -1038,18 +1046,18 @@
     ["zona", "artigianale"]
   ];
   function stemKey(key) {
-    const tokens = key.split(" ");
+    const tokens2 = key.split(" ");
     let rest = null;
-    const first = tokens[0];
+    const first = tokens2[0];
     for (const prefix of MULTI_WAY_TYPE_PREFIXES) {
-      if (tokens.length > prefix.length && prefix.every((word, i) => tokens[i] === word)) {
-        rest = tokens.slice(prefix.length);
+      if (tokens2.length > prefix.length && prefix.every((word, i) => tokens2[i] === word)) {
+        rest = tokens2.slice(prefix.length);
         break;
       }
     }
-    if (!rest && tokens.length >= 2 && first !== void 0 && WAY_TYPE_WORDS.has(first)) {
-      rest = tokens.slice(1);
-    } else if (tokens.length === 1 && first !== void 0) {
+    if (!rest && tokens2.length >= 2 && first !== void 0 && WAY_TYPE_WORDS.has(first)) {
+      rest = tokens2.slice(1);
+    } else if (tokens2.length === 1 && first !== void 0) {
       const m = first.match(GERMAN_SUFFIXES);
       if (m && m[1] !== void 0) rest = [m[1]];
     }
@@ -1068,9 +1076,9 @@
     return stem.length >= 3 ? stem : null;
   }
   function stripArticles(key) {
-    const tokens = key.split(" ").filter((token) => !ARTICLES.has(token)).map((token) => token.replace(/^[ld]'/, ""));
-    if (tokens.length < 2) return null;
-    const stripped = tokens.join(" ");
+    const tokens2 = key.split(" ").filter((token) => !ARTICLES.has(token)).map((token) => token.replace(/^[ld]'/, ""));
+    if (tokens2.length < 2) return null;
+    const stripped = tokens2.join(" ");
     return stripped === key ? null : stripped;
   }
   function k2(name) {
@@ -1080,9 +1088,9 @@
     s = s.replace(/\b(\p{L})\. ?(\p{L})\.(?=\s|$)/gu, "$1$2");
     s = s.replace(/-/g, " ");
     s = s.replace(/\s+/g, " ").trim();
-    const tokens = s.split(" ").filter((t2) => t2.length > 0);
+    const tokens2 = s.split(" ").filter((t2) => t2.length > 0);
     let variants = [[]];
-    tokens.forEach((token, i) => {
+    tokens2.forEach((token, i) => {
       const bare = token.replace(/\./g, "");
       const rule = ABBREV_MAP.get(bare);
       const options = rule && (!rule.firstTokenOnly || i === 0) ? rule.expansions : [bare];
@@ -2115,48 +2123,126 @@
     (status) => `
 .chk-badge-${status} { background: ${STATUS_STYLES[status].strokeColor}; }`
   ).join("\n");
+  var tokens = `
+.chk-pane, .chk-helper {
+  --chk-bg: var(--wz-color-background, #ffffff);
+  --chk-surface: var(--wz-color-background-variant, #f4f6f8);
+  --chk-text: var(--wz-color-on-background, #1b1d20);
+  --chk-muted: var(--wz-color-on-background-variant, #6b7280);
+  --chk-border: var(--wz-color-hairline, #d9dde2);
+  --chk-primary: var(--wz-color-primary, #2b5fa4);
+  --chk-primary-contrast: var(--wz-color-on-primary, #ffffff);
+  --chk-info-bg: rgba(43, 95, 164, .10);
+  --chk-ok: #3f8a32;
+  --chk-error: #c0392b;
+  --chk-radius: 8px;
+}
+html.chk-theme-dark .chk-pane, html.chk-theme-dark .chk-helper {
+  --chk-bg: var(--wz-color-background, #1f2226);
+  --chk-surface: var(--wz-color-background-variant, #2a2e33);
+  --chk-text: var(--wz-color-on-background, #e6e8eb);
+  --chk-muted: var(--wz-color-on-background-variant, #9aa1aa);
+  --chk-border: var(--wz-color-hairline, #3a3f45);
+  --chk-primary: var(--wz-color-primary, #5b9bd5);
+  --chk-info-bg: rgba(91, 155, 213, .16);
+  --chk-ok: #6cc05a;
+  --chk-error: #e57368;
+}`;
   var CSS = `
-.chk-pane { font-size: 12px; padding: 6px 8px; display: flex; flex-direction: column; gap: 8px; }
-.chk-pane button { cursor: pointer; }
-.chk-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.chk-status-line { flex: 1; min-width: 120px; }
-.chk-unsaved { color: #b35c00; font-weight: bold; }
-.chk-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.chk-chip { border: 1px solid #ccc; border-radius: 10px; padding: 1px 8px; background: #fff; font-size: 11px; }
-.chk-chip.chk-chip-active { border-color: #333; box-shadow: inset 0 0 0 1px #333; }
+${tokens}
+
+.chk-pane { font-size: 12px; padding: 8px; display: flex; flex-direction: column; gap: 10px; color: var(--chk-text); }
+.chk-pane button { cursor: pointer; font-family: inherit; }
+.chk-pane label { display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer; }
+.chk-pane select, .chk-pane input[type="number"] { background: var(--chk-bg); color: var(--chk-text); border: 1px solid var(--chk-border); border-radius: 5px; padding: 2px 5px; font-size: 11px; }
+.chk-pane input[type="checkbox"] { accent-color: var(--chk-primary); }
+
+.chk-brand { display: flex; align-items: center; gap: 8px; }
+.chk-brand-icon { font-size: 16px; line-height: 1; }
+.chk-brand-title { font-weight: bold; font-size: 14px; color: var(--chk-text); }
+.chk-brand-version { margin-left: auto; font-size: 11px; color: var(--chk-muted); }
+
+.chk-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.chk-btn { font-size: 11px; padding: 4px 10px; border: 1px solid var(--chk-border); border-radius: 6px; background: var(--chk-surface); color: var(--chk-text); }
+.chk-btn:hover { border-color: var(--chk-primary); color: var(--chk-primary); }
+.chk-unsaved { color: #b35c00; font-weight: bold; font-size: 11px; margin-left: auto; }
+
+.chk-banner { padding: 7px 10px; border-radius: var(--chk-radius); background: var(--chk-info-bg); color: var(--chk-text); }
+.chk-banner.chk-banner-ok { background: rgba(63, 138, 50, .16); color: var(--chk-ok); font-weight: 600; }
+.chk-banner.chk-error { background: rgba(192, 57, 43, .16); color: var(--chk-error); font-weight: 600; }
+
+.chk-master { display: flex; gap: 18px; flex-wrap: wrap; padding: 8px 10px; background: var(--chk-surface); border: 1px solid var(--chk-border); border-radius: var(--chk-radius); }
+
+.chk-switch { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.chk-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.chk-switch-track { position: relative; flex: 0 0 auto; width: 34px; height: 20px; border-radius: 10px; background: var(--chk-border); transition: background .15s; }
+.chk-switch-knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.35); transition: transform .15s; }
+.chk-switch input:checked + .chk-switch-track { background: var(--chk-primary); }
+.chk-switch input:checked + .chk-switch-track .chk-switch-knob { transform: translateX(14px); }
+.chk-switch input:focus-visible + .chk-switch-track { outline: 2px solid var(--chk-primary); outline-offset: 2px; }
+.chk-switch-label { font-size: 12px; }
+
+.chk-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chk-chip { display: inline-flex; align-items: center; border: 1px solid var(--chk-border); border-radius: 12px; padding: 2px 9px; background: var(--chk-surface); color: var(--chk-text); font-size: 11px; }
+.chk-chip:hover { border-color: var(--chk-primary); }
+.chk-chip.chk-chip-active { border-color: var(--chk-primary); background: var(--chk-info-bg); color: var(--chk-primary); font-weight: 600; }
 .chk-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; }
-.chk-groups { display: flex; flex-direction: column; gap: 4px; max-height: 50vh; overflow-y: auto; }
-.chk-group { border: 1px solid #ddd; border-radius: 4px; }
-.chk-group-header { display: flex; align-items: center; gap: 6px; padding: 4px 6px; cursor: pointer; }
-.chk-group-header:hover { background: #f5f5f5; }
+
+.chk-groups { display: flex; flex-direction: column; gap: 5px; max-height: 48vh; overflow-y: auto; }
+.chk-group { border: 1px solid var(--chk-border); border-radius: var(--chk-radius); background: var(--chk-surface); overflow: hidden; }
+.chk-group-header { display: flex; align-items: center; gap: 6px; padding: 5px 8px; cursor: pointer; }
+.chk-group-header:hover { background: var(--chk-info-bg); }
 .chk-badge { display: inline-block; min-width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 ${statusChipRules}
-.chk-group-names { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.chk-arrow { color: #888; }
-.chk-suggestion { font-weight: bold; }
-.chk-note { color: #888; font-style: italic; }
-.chk-count { color: #666; }
-.chk-fix-all { font-size: 11px; }
-.chk-rows { border-top: 1px solid #eee; }
-.chk-row { display: flex; align-items: center; gap: 6px; padding: 2px 6px 2px 18px; cursor: pointer; }
-.chk-row:hover { background: #f0f7ff; }
-.chk-row.chk-selected { background: #e0efff; }
-.chk-row-meta { color: #888; flex: 1; }
-.chk-locate { font-size: 13px; line-height: 1; padding: 0 5px; }
-a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3px; padding: 0 5px; color: #1a73e8; background: #fff; }
-.chk-settings summary { cursor: pointer; font-weight: bold; margin: 4px 0; }
-.chk-settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; margin: 4px 0; }
-.chk-settings label { display: flex; align-items: center; gap: 4px; font-weight: normal; }
-.chk-settings-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
-.chk-empty { color: #4a8f3c; font-weight: bold; padding: 8px 0; }
-.chk-muted { color: #888; }
-.chk-error { color: #c00; }
-.chk-footer { font-size: 11px; border-top: 1px solid #eee; padding-top: 4px; margin-top: 2px; }
-.chk-helper { margin: 8px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; background: #fafafa; display: flex; flex-direction: column; gap: 5px; }
+.chk-group-names { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chk-arrow { color: var(--chk-muted); }
+.chk-suggestion { font-weight: bold; color: var(--chk-primary); }
+.chk-note { color: var(--chk-muted); font-style: italic; }
+.chk-count { color: var(--chk-muted); background: var(--chk-bg); border: 1px solid var(--chk-border); border-radius: 9px; padding: 0 6px; font-size: 10px; }
+.chk-fix-all { font-size: 11px; padding: 3px 9px; border: none; border-radius: 6px; background: var(--chk-primary); color: var(--chk-primary-contrast); }
+.chk-fix-all:hover { filter: brightness(1.08); }
+.chk-fix-all:disabled { opacity: .6; cursor: default; }
+
+.chk-rows { border-top: 1px solid var(--chk-border); }
+.chk-row { display: flex; align-items: center; gap: 6px; padding: 3px 8px 3px 16px; cursor: pointer; }
+.chk-row:hover { background: var(--chk-info-bg); }
+.chk-row.chk-selected { background: var(--chk-info-bg); box-shadow: inset 2px 0 0 var(--chk-primary); }
+.chk-row-meta { color: var(--chk-muted); flex: 1; }
+.chk-locate { font-size: 13px; line-height: 1; padding: 0 5px; background: transparent; border: none; color: var(--chk-text); }
+.chk-locate:hover { color: var(--chk-primary); }
+a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); border-radius: 4px; padding: 0 5px; color: var(--chk-primary); background: var(--chk-bg); }
+
+.chk-section { border: 1px solid var(--chk-border); border-radius: var(--chk-radius); background: var(--chk-surface); overflow: hidden; }
+.chk-section > summary { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-weight: bold; cursor: pointer; list-style: none; color: var(--chk-text); }
+.chk-section > summary::-webkit-details-marker { display: none; }
+.chk-section > summary::after { content: "▸"; margin-left: auto; color: var(--chk-muted); transition: transform .15s; }
+.chk-section[open] > summary::after { transform: rotate(90deg); }
+.chk-section[open] > summary { border-bottom: 1px solid var(--chk-border); }
+.chk-section-icon { font-size: 14px; line-height: 1; }
+.chk-section-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+
+.chk-subsection { border-top: 1px solid var(--chk-border); }
+.chk-subsection:first-child { border-top: none; }
+.chk-subsection > summary { display: flex; align-items: center; gap: 6px; padding: 6px 0; font-weight: 600; cursor: pointer; list-style: none; color: var(--chk-text); }
+.chk-subsection > summary::-webkit-details-marker { display: none; }
+.chk-subsection > summary::after { content: "▸"; margin-left: auto; color: var(--chk-muted); transition: transform .15s; }
+.chk-subsection[open] > summary::after { transform: rotate(90deg); }
+.chk-subsection-body { padding: 4px 0 8px; display: flex; flex-direction: column; gap: 6px; }
+
+.chk-settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; margin: 2px 0; }
+.chk-settings-row { display: flex; align-items: center; gap: 8px; }
+.chk-settings-label { font-weight: 600; }
+
+.chk-empty { color: var(--chk-ok); font-weight: bold; padding: 10px 0; text-align: center; }
+.chk-muted { color: var(--chk-muted); }
+.chk-error { color: var(--chk-error); }
+.chk-footer { font-size: 11px; border-top: 1px solid var(--chk-border); padding-top: 6px; color: var(--chk-muted); }
+.chk-footer a { color: var(--chk-primary); }
+
+.chk-helper { margin: 8px; padding: 8px 10px; border: 1px solid var(--chk-border); border-radius: var(--chk-radius); font-size: 12px; background: var(--chk-surface); color: var(--chk-text); display: flex; flex-direction: column; gap: 6px; }
 .chk-helper-head { display: flex; align-items: center; gap: 6px; }
 .chk-helper-sug { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .chk-helper button { cursor: pointer; }
-.chk-master { display: flex; gap: 14px; padding: 2px 0; border-bottom: 1px solid #eee; }
 `;
   var injected = false;
   function injectStyles() {
@@ -2199,6 +2285,22 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
     if (className) node.className = className;
     if (text !== void 0) node.textContent = text;
     return node;
+  }
+  function wmeThemeIsDark(start) {
+    let node = start;
+    while (node) {
+      const match = getComputedStyle(node).backgroundColor.match(/rgba?\(([^)]+)\)/);
+      if (match && match[1]) {
+        const parts = match[1].split(",").map((p) => parseFloat(p));
+        const r = parts[0] ?? 0;
+        const g = parts[1] ?? 0;
+        const b = parts[2] ?? 0;
+        const a = parts[3] ?? 1;
+        if (a > 0) return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
+      }
+      node = node.parentElement;
+    }
+    return false;
   }
   function formatNote(note) {
     if (!note) return "";
@@ -2288,6 +2390,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
       const { tabLabel, tabPane } = await this.sdk.Sidebar.registerScriptTab();
       tabLabel.textContent = "CH Names";
       this.pane = tabPane;
+      document.documentElement.classList.toggle("chk-theme-dark", wmeThemeIsDark(this.pane));
       this.buildSkeleton();
       this.scanner.onUpdate((snapshot) => this.render(snapshot));
       this.sdk.Events.on({
@@ -2311,20 +2414,28 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
     }
     buildSkeleton() {
       this.pane.classList.add("chk-pane");
-      const header = el("div", "chk-header");
-      this.statusLine = el("span", "chk-status-line", t("stateIdle"));
-      this.unsavedBadge = el("span", "chk-unsaved", "");
-      const rescanBtn = el("button", "", t("rescan"));
+      const brand = el("div", "chk-brand");
+      brand.append(
+        el("span", "chk-brand-icon", "🇨🇭"),
+        el("span", "chk-brand-title", "CH Names"),
+        el("span", "chk-brand-version", `v${"1.11.0"}`)
+      );
+      const toolbar = el("div", "chk-toolbar");
+      const rescanBtn = el("button", "chk-btn", t("rescan"));
       rescanBtn.title = t("rescanTitle");
       rescanBtn.addEventListener("click", () => this.scanner.rescan());
-      const nextBtn = el("button", "", t("nextIssue"));
+      const nextBtn = el("button", "chk-btn", t("nextIssue"));
       nextBtn.title = t("nextIssueTitle");
       nextBtn.addEventListener("click", () => this.selectNextIssue());
-      header.append(this.statusLine, this.unsavedBadge, rescanBtn, nextBtn);
+      this.unsavedBadge = el("span", "chk-unsaved", "");
+      toolbar.append(rescanBtn, nextBtn, this.unsavedBadge);
+      this.statusLine = el("div", "chk-banner", t("stateIdle"));
       this.chipsBox = el("div", "chk-chips");
       this.groupsBox = el("div", "chk-groups");
       this.pane.append(
-        header,
+        brand,
+        toolbar,
+        this.statusLine,
         this.buildMasterToggles(),
         this.chipsBox,
         this.groupsBox,
@@ -2334,35 +2445,57 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
       );
     }
     buildMasterToggles() {
-      const row = el("div", "chk-settings chk-master");
+      const row = el("div", "chk-master");
       const settings = this.settings.get();
-      const enabledLabel = el("label");
-      enabledLabel.title = t("toggleEnabledTitle");
-      const enabledCb = el("input");
-      enabledCb.type = "checkbox";
-      enabledCb.checked = settings.enabled;
-      enabledCb.addEventListener("change", () => {
-        this.settings.update({ enabled: enabledCb.checked });
-        if (enabledCb.checked) this.scanner.requestScan();
-        else this.scanner.disable();
-      });
-      enabledLabel.append(enabledCb, t("toggleEnabled"));
-      const autoLabel = el("label");
-      autoLabel.title = t("toggleAutoScanTitle");
-      const autoCb = el("input");
-      autoCb.type = "checkbox";
-      autoCb.checked = settings.autoScan;
-      autoCb.addEventListener("change", () => {
-        this.settings.update({ autoScan: autoCb.checked });
-        if (autoCb.checked && this.settings.get().enabled) this.scanner.requestScan();
-      });
-      autoLabel.append(autoCb, t("toggleAutoScan"));
-      row.append(enabledLabel, autoLabel);
+      row.append(
+        this.toggleSwitch(
+          t("toggleEnabled"),
+          settings.enabled,
+          (checked) => {
+            this.settings.update({ enabled: checked });
+            if (checked) this.scanner.requestScan();
+            else this.scanner.disable();
+          },
+          t("toggleEnabledTitle")
+        ),
+        this.toggleSwitch(
+          t("toggleAutoScan"),
+          settings.autoScan,
+          (checked) => {
+            this.settings.update({ autoScan: checked });
+            if (checked && this.settings.get().enabled) this.scanner.requestScan();
+          },
+          t("toggleAutoScanTitle")
+        )
+      );
       return row;
+    }
+    /** iOS-style toggle: a visually hidden checkbox plus a CSS track/knob and a label. */
+    toggleSwitch(text, checked, onChange, title) {
+      const label = el("label", "chk-switch");
+      if (title) label.title = title;
+      const input = el("input");
+      input.type = "checkbox";
+      input.checked = checked;
+      input.addEventListener("change", () => onChange(input.checked));
+      const track = el("span", "chk-switch-track");
+      track.appendChild(el("span", "chk-switch-knob"));
+      label.append(input, track, el("span", "chk-switch-label", text));
+      return label;
+    }
+    /** A collapsible settings sub-section with an icon header. */
+    buildSubsection(icon, title, children) {
+      const details = el("details", "chk-subsection");
+      const summary = el("summary");
+      summary.append(el("span", "chk-section-icon", icon), el("span", "", title));
+      details.appendChild(summary);
+      const body = el("div", "chk-subsection-body");
+      for (const child of children) body.appendChild(child);
+      details.appendChild(body);
+      return details;
     }
     buildFooter() {
       const footer = el("div", "chk-footer");
-      footer.appendChild(el("span", "chk-muted", `v${"1.10.0"} · `));
       const link = el("a", "", "Changelog");
       link.href = "https://github.com/Neprena/WME-CH-Street-Name-Checker/blob/main/CHANGELOG.md";
       link.target = "_blank";
@@ -2371,15 +2504,19 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
       return footer;
     }
     buildLegend() {
-      const details = el("details", "chk-settings");
-      details.appendChild(el("summary", "", t("legendTitle")));
+      const details = el("details", "chk-section");
+      const summary = el("summary");
+      summary.append(el("span", "chk-section-icon", "🎨"), el("span", "", t("legendTitle")));
+      details.appendChild(summary);
+      const body = el("div", "chk-section-body");
       for (const status of Object.keys(STATUS_STYLES)) {
         const row = el("div", "chk-settings-row");
         const dot = el("span", "chk-dot");
         dot.style.background = STATUS_STYLES[status].strokeColor;
         row.append(dot, el("span", "", `${status}: ${t(LEGEND_KEYS[status])}`));
-        details.appendChild(row);
+        body.appendChild(row);
       }
+      details.appendChild(body);
       return details;
     }
     render(snapshot, force = false) {
@@ -2397,6 +2534,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
       if (state === "error" && error) statusText += `: ${error}`;
       this.statusLine.textContent = statusText;
       this.statusLine.classList.toggle("chk-error", state === "error");
+      this.statusLine.classList.toggle("chk-banner-ok", state === "done" && inViewport.length === 0);
       this.unsavedBadge.textContent = snapshot.unsavedCount > 0 ? t("unsavedBadge", { n: snapshot.unsavedCount }) : "";
       if (!force && issues === this.lastRenderedIssues) return;
       this.lastRenderedIssues = issues;
@@ -2662,8 +2800,11 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
       });
     }
     buildSettings() {
-      const details = el("details", "chk-settings");
-      details.appendChild(el("summary", "", t("settingsTitle")));
+      const details = el("details", "chk-section");
+      const summary = el("summary");
+      summary.append(el("span", "chk-section-icon", "⚙️"), el("span", "", t("settingsTitle")));
+      details.appendChild(summary);
+      const body = el("div", "chk-section-body");
       const settings = this.settings.get();
       const apply = (partial, rescan = false) => {
         this.settings.update(partial);
@@ -2685,8 +2826,6 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
         label.append(cb, option.label);
         grid.appendChild(label);
       }
-      details.appendChild(el("div", "", t("roadTypesLabel")));
-      details.appendChild(grid);
       const statusGrid = el("div", "chk-settings-grid");
       for (const status of ALL_STATUSES) {
         const label = el("label");
@@ -2706,39 +2845,30 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
         label.append(cb, dot, status);
         statusGrid.appendChild(label);
       }
-      details.appendChild(el("div", "", t("statusesLabel")));
-      details.appendChild(statusGrid);
-      const toggle = (textKey, key, titleKey) => {
-        const label = el("label");
-        if (titleKey) label.title = t(titleKey);
-        const cb = el("input");
-        cb.type = "checkbox";
-        cb.checked = settings[key];
-        cb.addEventListener("change", () => apply({ [key]: cb.checked }));
-        label.append(cb, t(textKey));
-        const row = el("div", "chk-settings-row");
-        row.appendChild(label);
-        return row;
-      };
-      details.appendChild(toggle("altOk", "altNameCountsAsOk", "altOkTitle"));
-      details.appendChild(toggle("showMapLabels", "showMapLabels"));
-      details.appendChild(toggle("keepOldName", "keepOldNameAsAlt", "keepOldNameTitle"));
-      details.appendChild(toggle("guidelineChecks", "guidelineChecks", "guidelineChecksTitle"));
-      details.appendChild(toggle("helperSetting", "editPanelHelper"));
-      details.appendChild(toggle("geometryMatching", "geometryMatching", "geometryMatchingTitle"));
-      const viewportRow = el("div", "chk-settings-row");
-      const viewportLabel = el("label");
-      viewportLabel.title = t("viewportOnlyTitle");
-      const viewportCb = el("input");
-      viewportCb.type = "checkbox";
-      viewportCb.checked = settings.viewportOnly;
-      viewportCb.addEventListener("change", () => {
-        this.settings.update({ viewportOnly: viewportCb.checked });
-        this.render(this.scanner.getSnapshot(), true);
-      });
-      viewportLabel.append(viewportCb, t("viewportOnly"));
-      viewportRow.appendChild(viewportLabel);
-      details.appendChild(viewportRow);
+      const optionToggle = (textKey, key, titleKey) => this.toggleSwitch(
+        t(textKey),
+        settings[key],
+        (checked) => apply({ [key]: checked }),
+        titleKey ? t(titleKey) : void 0
+      );
+      const viewportToggle = this.toggleSwitch(
+        t("viewportOnly"),
+        settings.viewportOnly,
+        (checked) => {
+          this.settings.update({ viewportOnly: checked });
+          this.render(this.scanner.getSnapshot(), true);
+        },
+        t("viewportOnlyTitle")
+      );
+      const options = [
+        optionToggle("altOk", "altNameCountsAsOk", "altOkTitle"),
+        optionToggle("showMapLabels", "showMapLabels"),
+        optionToggle("keepOldName", "keepOldNameAsAlt", "keepOldNameTitle"),
+        optionToggle("guidelineChecks", "guidelineChecks", "guidelineChecksTitle"),
+        optionToggle("helperSetting", "editPanelHelper"),
+        optionToggle("geometryMatching", "geometryMatching", "geometryMatchingTitle"),
+        viewportToggle
+      ];
       const scopingRow = el("div", "chk-settings-row");
       scopingRow.appendChild(el("span", "", t("scopingLabel")));
       const select = el("select");
@@ -2756,7 +2886,6 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
       select.title = t("scopingTitle");
       select.addEventListener("change", () => apply({ cityScoping: select.value }));
       scopingRow.appendChild(select);
-      details.appendChild(scopingRow);
       const zoomRow = el("div", "chk-settings-row");
       zoomRow.appendChild(el("span", "", t("minZoomLabel")));
       const zoomInput = el("input");
@@ -2769,7 +2898,6 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
         if (Number.isFinite(v) && v >= 12 && v <= 22) apply({ minZoom: v }, true);
       });
       zoomRow.appendChild(zoomInput);
-      details.appendChild(zoomRow);
       const langRow = el("div", "chk-settings-row");
       langRow.appendChild(el("span", "", t("languageLabel")));
       const langSelect = el("select");
@@ -2790,7 +2918,13 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
         this.rebuild();
       });
       langRow.appendChild(langSelect);
-      details.appendChild(langRow);
+      body.append(
+        this.buildSubsection("🛣️", t("roadTypesLabel"), [grid]),
+        this.buildSubsection("🏷️", t("statusesLabel"), [statusGrid]),
+        this.buildSubsection("🎛️", t("optionsLabel"), options),
+        this.buildSubsection("📍", t("scopeDisplayLabel"), [scopingRow, zoomRow, langRow])
+      );
+      details.appendChild(body);
       return details;
     }
   };
@@ -3023,7 +3157,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid #ccc; border-radius: 3p
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.10.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.11.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();

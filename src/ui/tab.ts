@@ -60,6 +60,28 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+/**
+ * Detect WME's editor theme by measuring the first opaque background up the
+ * pane's ancestry and checking its perceived luminance. This follows the actual
+ * editor skin rather than the OS prefers-color-scheme, which can disagree.
+ */
+function wmeThemeIsDark(start: HTMLElement): boolean {
+  let node: HTMLElement | null = start;
+  while (node) {
+    const match = getComputedStyle(node).backgroundColor.match(/rgba?\(([^)]+)\)/);
+    if (match && match[1]) {
+      const parts = match[1].split(",").map((p) => parseFloat(p));
+      const r = parts[0] ?? 0;
+      const g = parts[1] ?? 0;
+      const b = parts[2] ?? 0;
+      const a = parts[3] ?? 1;
+      if (a > 0) return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
+    }
+    node = node.parentElement;
+  }
+  return false;
+}
+
 export function formatNote(note: IssueNote | null): string {
   if (!note) return "";
   const parts: string[] = [];
@@ -167,6 +189,7 @@ export class TabUI {
     const { tabLabel, tabPane } = await this.sdk.Sidebar.registerScriptTab();
     tabLabel.textContent = "CH Names";
     this.pane = tabPane;
+    document.documentElement.classList.toggle("chk-theme-dark", wmeThemeIsDark(this.pane));
     this.buildSkeleton();
     this.scanner.onUpdate((snapshot) => this.render(snapshot));
     this.sdk.Events.on({
@@ -196,22 +219,31 @@ export class TabUI {
   private buildSkeleton(): void {
     this.pane.classList.add("chk-pane");
 
-    const header = el("div", "chk-header");
-    this.statusLine = el("span", "chk-status-line", t("stateIdle"));
-    this.unsavedBadge = el("span", "chk-unsaved", "");
-    const rescanBtn = el("button", "", t("rescan"));
+    const brand = el("div", "chk-brand");
+    brand.append(
+      el("span", "chk-brand-icon", "🇨🇭"),
+      el("span", "chk-brand-title", "CH Names"),
+      el("span", "chk-brand-version", `v${__SCRIPT_VERSION__}`),
+    );
+
+    const toolbar = el("div", "chk-toolbar");
+    const rescanBtn = el("button", "chk-btn", t("rescan"));
     rescanBtn.title = t("rescanTitle");
     rescanBtn.addEventListener("click", () => this.scanner.rescan());
-    const nextBtn = el("button", "", t("nextIssue"));
+    const nextBtn = el("button", "chk-btn", t("nextIssue"));
     nextBtn.title = t("nextIssueTitle");
     nextBtn.addEventListener("click", () => this.selectNextIssue());
-    header.append(this.statusLine, this.unsavedBadge, rescanBtn, nextBtn);
+    this.unsavedBadge = el("span", "chk-unsaved", "");
+    toolbar.append(rescanBtn, nextBtn, this.unsavedBadge);
 
+    this.statusLine = el("div", "chk-banner", t("stateIdle"));
     this.chipsBox = el("div", "chk-chips");
     this.groupsBox = el("div", "chk-groups");
 
     this.pane.append(
-      header,
+      brand,
+      toolbar,
+      this.statusLine,
       this.buildMasterToggles(),
       this.chipsBox,
       this.groupsBox,
@@ -222,39 +254,65 @@ export class TabUI {
   }
 
   private buildMasterToggles(): HTMLElement {
-    const row = el("div", "chk-settings chk-master");
+    const row = el("div", "chk-master");
     const settings = this.settings.get();
-
-    const enabledLabel = el("label");
-    enabledLabel.title = t("toggleEnabledTitle");
-    const enabledCb = el("input") as HTMLInputElement;
-    enabledCb.type = "checkbox";
-    enabledCb.checked = settings.enabled;
-    enabledCb.addEventListener("change", () => {
-      this.settings.update({ enabled: enabledCb.checked });
-      if (enabledCb.checked) this.scanner.requestScan();
-      else this.scanner.disable();
-    });
-    enabledLabel.append(enabledCb, t("toggleEnabled"));
-
-    const autoLabel = el("label");
-    autoLabel.title = t("toggleAutoScanTitle");
-    const autoCb = el("input") as HTMLInputElement;
-    autoCb.type = "checkbox";
-    autoCb.checked = settings.autoScan;
-    autoCb.addEventListener("change", () => {
-      this.settings.update({ autoScan: autoCb.checked });
-      if (autoCb.checked && this.settings.get().enabled) this.scanner.requestScan();
-    });
-    autoLabel.append(autoCb, t("toggleAutoScan"));
-
-    row.append(enabledLabel, autoLabel);
+    row.append(
+      this.toggleSwitch(
+        t("toggleEnabled"),
+        settings.enabled,
+        (checked) => {
+          this.settings.update({ enabled: checked });
+          if (checked) this.scanner.requestScan();
+          else this.scanner.disable();
+        },
+        t("toggleEnabledTitle"),
+      ),
+      this.toggleSwitch(
+        t("toggleAutoScan"),
+        settings.autoScan,
+        (checked) => {
+          this.settings.update({ autoScan: checked });
+          if (checked && this.settings.get().enabled) this.scanner.requestScan();
+        },
+        t("toggleAutoScanTitle"),
+      ),
+    );
     return row;
+  }
+
+  /** iOS-style toggle: a visually hidden checkbox plus a CSS track/knob and a label. */
+  private toggleSwitch(
+    text: string,
+    checked: boolean,
+    onChange: (checked: boolean) => void,
+    title?: string,
+  ): HTMLElement {
+    const label = el("label", "chk-switch");
+    if (title) label.title = title;
+    const input = el("input") as HTMLInputElement;
+    input.type = "checkbox";
+    input.checked = checked;
+    input.addEventListener("change", () => onChange(input.checked));
+    const track = el("span", "chk-switch-track");
+    track.appendChild(el("span", "chk-switch-knob"));
+    label.append(input, track, el("span", "chk-switch-label", text));
+    return label;
+  }
+
+  /** A collapsible settings sub-section with an icon header. */
+  private buildSubsection(icon: string, title: string, children: HTMLElement[]): HTMLElement {
+    const details = el("details", "chk-subsection");
+    const summary = el("summary");
+    summary.append(el("span", "chk-section-icon", icon), el("span", "", title));
+    details.appendChild(summary);
+    const body = el("div", "chk-subsection-body");
+    for (const child of children) body.appendChild(child);
+    details.appendChild(body);
+    return details;
   }
 
   private buildFooter(): HTMLElement {
     const footer = el("div", "chk-footer");
-    footer.appendChild(el("span", "chk-muted", `v${__SCRIPT_VERSION__} · `));
     const link = el("a", "", "Changelog");
     link.href = "https://github.com/Neprena/WME-CH-Street-Name-Checker/blob/main/CHANGELOG.md";
     link.target = "_blank";
@@ -264,15 +322,19 @@ export class TabUI {
   }
 
   private buildLegend(): HTMLElement {
-    const details = el("details", "chk-settings");
-    details.appendChild(el("summary", "", t("legendTitle")));
+    const details = el("details", "chk-section");
+    const summary = el("summary");
+    summary.append(el("span", "chk-section-icon", "🎨"), el("span", "", t("legendTitle")));
+    details.appendChild(summary);
+    const body = el("div", "chk-section-body");
     for (const status of Object.keys(STATUS_STYLES) as IssueStatus[]) {
       const row = el("div", "chk-settings-row");
       const dot = el("span", "chk-dot");
       dot.style.background = STATUS_STYLES[status].strokeColor;
       row.append(dot, el("span", "", `${status}: ${t(LEGEND_KEYS[status])}`));
-      details.appendChild(row);
+      body.appendChild(row);
     }
+    details.appendChild(body);
     return details;
   }
 
@@ -294,6 +356,7 @@ export class TabUI {
     if (state === "error" && error) statusText += `: ${error}`;
     this.statusLine.textContent = statusText;
     this.statusLine.classList.toggle("chk-error", state === "error");
+    this.statusLine.classList.toggle("chk-banner-ok", state === "done" && inViewport.length === 0);
 
     this.unsavedBadge.textContent =
       snapshot.unsavedCount > 0 ? t("unsavedBadge", { n: snapshot.unsavedCount }) : "";
@@ -601,8 +664,11 @@ export class TabUI {
   }
 
   private buildSettings(): HTMLElement {
-    const details = el("details", "chk-settings");
-    details.appendChild(el("summary", "", t("settingsTitle")));
+    const details = el("details", "chk-section");
+    const summary = el("summary");
+    summary.append(el("span", "chk-section-icon", "⚙️"), el("span", "", t("settingsTitle")));
+    details.appendChild(summary);
+    const body = el("div", "chk-section-body");
     const settings = this.settings.get();
 
     const apply = (partial: Partial<Settings>, rescan = false): void => {
@@ -626,8 +692,6 @@ export class TabUI {
       label.append(cb, option.label);
       grid.appendChild(label);
     }
-    details.appendChild(el("div", "", t("roadTypesLabel")));
-    details.appendChild(grid);
 
     const statusGrid = el("div", "chk-settings-grid");
     for (const status of ALL_STATUSES) {
@@ -648,10 +712,8 @@ export class TabUI {
       label.append(cb, dot, status);
       statusGrid.appendChild(label);
     }
-    details.appendChild(el("div", "", t("statusesLabel")));
-    details.appendChild(statusGrid);
 
-    const toggle = (
+    const optionToggle = (
       textKey: StringKey,
       key: keyof Pick<
         Settings,
@@ -663,40 +725,34 @@ export class TabUI {
         | "geometryMatching"
       >,
       titleKey?: StringKey,
-    ): HTMLElement => {
-      const label = el("label");
-      if (titleKey) label.title = t(titleKey);
-      const cb = el("input") as HTMLInputElement;
-      cb.type = "checkbox";
-      cb.checked = settings[key];
-      cb.addEventListener("change", () => apply({ [key]: cb.checked }));
-      label.append(cb, t(textKey));
-      const row = el("div", "chk-settings-row");
-      row.appendChild(label);
-      return row;
-    };
-
-    details.appendChild(toggle("altOk", "altNameCountsAsOk", "altOkTitle"));
-    details.appendChild(toggle("showMapLabels", "showMapLabels"));
-    details.appendChild(toggle("keepOldName", "keepOldNameAsAlt", "keepOldNameTitle"));
-    details.appendChild(toggle("guidelineChecks", "guidelineChecks", "guidelineChecksTitle"));
-    details.appendChild(toggle("helperSetting", "editPanelHelper"));
-    details.appendChild(toggle("geometryMatching", "geometryMatching", "geometryMatchingTitle"));
+    ): HTMLElement =>
+      this.toggleSwitch(
+        t(textKey),
+        settings[key],
+        (checked) => apply({ [key]: checked }),
+        titleKey ? t(titleKey) : undefined,
+      );
 
     // Display-only filter: refresh the rendered list, no rescan / re-evaluation.
-    const viewportRow = el("div", "chk-settings-row");
-    const viewportLabel = el("label");
-    viewportLabel.title = t("viewportOnlyTitle");
-    const viewportCb = el("input") as HTMLInputElement;
-    viewportCb.type = "checkbox";
-    viewportCb.checked = settings.viewportOnly;
-    viewportCb.addEventListener("change", () => {
-      this.settings.update({ viewportOnly: viewportCb.checked });
-      this.render(this.scanner.getSnapshot(), true);
-    });
-    viewportLabel.append(viewportCb, t("viewportOnly"));
-    viewportRow.appendChild(viewportLabel);
-    details.appendChild(viewportRow);
+    const viewportToggle = this.toggleSwitch(
+      t("viewportOnly"),
+      settings.viewportOnly,
+      (checked) => {
+        this.settings.update({ viewportOnly: checked });
+        this.render(this.scanner.getSnapshot(), true);
+      },
+      t("viewportOnlyTitle"),
+    );
+
+    const options = [
+      optionToggle("altOk", "altNameCountsAsOk", "altOkTitle"),
+      optionToggle("showMapLabels", "showMapLabels"),
+      optionToggle("keepOldName", "keepOldNameAsAlt", "keepOldNameTitle"),
+      optionToggle("guidelineChecks", "guidelineChecks", "guidelineChecksTitle"),
+      optionToggle("helperSetting", "editPanelHelper"),
+      optionToggle("geometryMatching", "geometryMatching", "geometryMatchingTitle"),
+      viewportToggle,
+    ];
 
     const scopingRow = el("div", "chk-settings-row");
     scopingRow.appendChild(el("span", "", t("scopingLabel")));
@@ -715,7 +771,6 @@ export class TabUI {
     select.title = t("scopingTitle");
     select.addEventListener("change", () => apply({ cityScoping: select.value as CityScoping }));
     scopingRow.appendChild(select);
-    details.appendChild(scopingRow);
 
     const zoomRow = el("div", "chk-settings-row");
     zoomRow.appendChild(el("span", "", t("minZoomLabel")));
@@ -729,7 +784,6 @@ export class TabUI {
       if (Number.isFinite(v) && v >= 12 && v <= 22) apply({ minZoom: v }, true);
     });
     zoomRow.appendChild(zoomInput);
-    details.appendChild(zoomRow);
 
     const langRow = el("div", "chk-settings-row");
     langRow.appendChild(el("span", "", t("languageLabel")));
@@ -751,8 +805,14 @@ export class TabUI {
       this.rebuild();
     });
     langRow.appendChild(langSelect);
-    details.appendChild(langRow);
 
+    body.append(
+      this.buildSubsection("🛣️", t("roadTypesLabel"), [grid]),
+      this.buildSubsection("🏷️", t("statusesLabel"), [statusGrid]),
+      this.buildSubsection("🎛️", t("optionsLabel"), options),
+      this.buildSubsection("📍", t("scopeDisplayLabel"), [scopingRow, zoomRow, langRow]),
+    );
+    details.appendChild(body);
     return details;
   }
 }
