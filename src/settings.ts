@@ -47,6 +47,7 @@ export const ALL_STATUSES: IssueStatus[] = [
   "LOOP",
   "NARROW_MISUSE",
   "OVER_LOCK",
+  "UNNAMED_NO_MATCH",
 ];
 
 export interface Settings {
@@ -80,7 +81,8 @@ export const DEFAULT_SETTINGS: Settings = {
   autoScan: true,
   minZoom: 15,
   checkedRoadTypes: ROAD_TYPE_OPTIONS.filter((r) => r.defaultChecked).map((r) => r.id),
-  enabledStatuses: [...ALL_STATUSES],
+  // UNNAMED_NO_MATCH is legitimately-unnamed noise: present but hidden by default.
+  enabledStatuses: ALL_STATUSES.filter((s) => s !== "UNNAMED_NO_MATCH"),
   altNameCountsAsOk: true,
   cityScoping: "off",
   showMapLabels: true,

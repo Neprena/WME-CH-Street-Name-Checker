@@ -36,6 +36,7 @@ export const LEGEND_KEYS: Record<IssueStatus, StringKey> = {
   LOOP: "legendLOOP",
   NARROW_MISUSE: "legendNARROW_MISUSE",
   OVER_LOCK: "legendOVER_LOCK",
+  UNNAMED_NO_MATCH: "legendUNNAMED_NO_MATCH",
 };
 
 export const STATE_KEYS: Record<ScanSnapshot["state"], StringKey> = {
@@ -123,6 +124,7 @@ const SEVERITY_ORDER: Record<IssueStatus, number> = {
   LOOP: 10,
   NARROW_MISUSE: 11,
   OVER_LOCK: 12,
+  UNNAMED_NO_MATCH: 13,
 };
 
 export function groupIssues(issues: Iterable<Issue>): IssueGroup[] {

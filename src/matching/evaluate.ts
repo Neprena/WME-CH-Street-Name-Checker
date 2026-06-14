@@ -20,6 +20,9 @@ export type IssueStatus =
   | "WRONG_CITY"
   | "NOT_FOUND"
   | "UNNAMED"
+  // Unnamed segment with no official street found underneath (geometry matching
+  // on): legitimately unnamed, reported separately and hidden by default.
+  | "UNNAMED_NO_MATCH"
   // Swiss guideline checks (see src/guidelines.ts):
   | "MICRO_SEGMENT"
   | "LOOP"
@@ -114,11 +117,16 @@ export function evaluateSegment(
     // With geometry matching, the official street under the segment becomes
     // a one-click suggestion.
     const suggestion = nearest && nearest.distanceM <= SUGGEST_MAX_M ? nearest.entry : null;
+    // With geometry matching on, "no official street underneath" means the
+    // segment is legitimately unnamed (normal). Without it we cannot tell, so it
+    // stays UNNAMED (an editor still has to investigate).
+    const status =
+      suggestion === null && settings.geometryMatching ? "UNNAMED_NO_MATCH" : "UNNAMED";
     return {
       kind: "issue",
       issue: {
         ...baseIssue,
-        status: "UNNAMED",
+        status,
         suggestion: suggestion?.namePart ?? null,
         note: suggestion ? noteFor(suggestion) : null,
         fixable: suggestion !== null,

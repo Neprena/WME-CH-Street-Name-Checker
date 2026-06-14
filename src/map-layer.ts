@@ -19,6 +19,7 @@ export const STATUS_STYLES: Record<IssueStatus, StatusStyle> = {
   WRONG_CITY: { strokeColor: "#ff5ca8", strokeDashstyle: "solid" },
   NOT_FOUND: { strokeColor: "#e02020", strokeDashstyle: "solid" },
   UNNAMED: { strokeColor: "#9b59b6", strokeDashstyle: "dash" },
+  UNNAMED_NO_MATCH: { strokeColor: "#9e9e9e", strokeDashstyle: "dash" },
   UNDER_LOCK: { strokeColor: "#c2185b", strokeDashstyle: "dash" },
   MICRO_SEGMENT: { strokeColor: "#00bcd4", strokeDashstyle: "solid" },
   LOOP: { strokeColor: "#795548", strokeDashstyle: "solid" },

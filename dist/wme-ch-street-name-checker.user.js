@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.13.0
+// @version      1.14.0
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -409,7 +409,8 @@
     editableOnlyTitle: "Hide segments locked above my editor rank",
     legendWRONG_CITY: "name exists, but in another locality (city scoping)",
     legendNOT_FOUND: "not found in the official register",
-    legendUNNAMED: "checked road type without a street name, dashed line",
+    legendUNNAMED: "checked road type without a name; the official street underneath is suggested when found, dashed line",
+    legendUNNAMED_NO_MATCH: "unnamed and no official street found underneath (geometry matching) — usually legitimate",
     legendMICRO_SEGMENT: "drivable segment shorter than 5 m (Swiss guideline; roundabouts excluded)",
     legendLOOP: "loop made of fewer than 3 segments (same endpoints); split it",
     legendNARROW_MISUSE: "Narrow Street misuse: one-way or shorter than 50 m",
@@ -497,7 +498,8 @@
     editableOnlyTitle: "Masquer les segments verrouillés au-dessus de mon niveau d'éditeur",
     legendWRONG_CITY: "le nom existe, mais dans une autre localité (scoping)",
     legendNOT_FOUND: "introuvable dans le répertoire officiel",
-    legendUNNAMED: "type de route vérifié sans nom, trait pointillé",
+    legendUNNAMED: "type de route vérifié sans nom ; la rue officielle dessous est suggérée si trouvée, trait pointillé",
+    legendUNNAMED_NO_MATCH: "sans nom et aucune rue officielle dessous (matching géométrique) — généralement normal",
     legendMICRO_SEGMENT: "segment carrossable de moins de 5 m (règle suisse; ronds-points exclus)",
     legendLOOP: "boucle de moins de 3 segments (nœuds identiques); à diviser",
     legendNARROW_MISUSE: "Rue étroite mal utilisée: sens unique ou moins de 50 m",
@@ -585,7 +587,8 @@
     editableOnlyTitle: "Über meinem Rang gesperrte Segmente ausblenden",
     legendWRONG_CITY: "Name existiert, aber in einer anderen Ortschaft (Scoping)",
     legendNOT_FOUND: "nicht im amtlichen Verzeichnis",
-    legendUNNAMED: "geprüfter Strassentyp ohne Namen, gestrichelt",
+    legendUNNAMED: "geprüfter Strassentyp ohne Namen; die amtliche Strasse darunter wird vorgeschlagen, falls gefunden, gestrichelt",
+    legendUNNAMED_NO_MATCH: "ohne Namen und keine amtliche Strasse darunter (Geometrie-Matching) — meist normal",
     legendMICRO_SEGMENT: "befahrbares Segment kürzer als 5 m (Schweizer Regel; Kreisel ausgenommen)",
     legendLOOP: "Schleife aus weniger als 3 Segmenten (gleiche Endknoten); aufteilen",
     legendNARROW_MISUSE: "Falsch verwendete enge Strasse: Einbahn oder kürzer als 50 m",
@@ -673,7 +676,8 @@
     editableOnlyTitle: "Nascondi i segmenti bloccati oltre il mio livello di editor",
     legendWRONG_CITY: "il nome esiste, ma in un'altra località (scoping)",
     legendNOT_FOUND: "non presente nel repertorio ufficiale",
-    legendUNNAMED: "tipo di strada verificato senza nome, linea tratteggiata",
+    legendUNNAMED: "tipo di strada verificato senza nome; la strada ufficiale sotto è suggerita se trovata, linea tratteggiata",
+    legendUNNAMED_NO_MATCH: "senza nome e nessuna strada ufficiale sotto (matching geometrico) — di solito normale",
     legendMICRO_SEGMENT: "segmento percorribile più corto di 5 m (regola svizzera; rotatorie escluse)",
     legendLOOP: "anello con meno di 3 segmenti (stessi nodi); da dividere",
     legendNARROW_MISUSE: "Strada stretta usata male: senso unico o meno di 50 m",
@@ -751,6 +755,7 @@
     WRONG_CITY: { strokeColor: "#ff5ca8", strokeDashstyle: "solid" },
     NOT_FOUND: { strokeColor: "#e02020", strokeDashstyle: "solid" },
     UNNAMED: { strokeColor: "#9b59b6", strokeDashstyle: "dash" },
+    UNNAMED_NO_MATCH: { strokeColor: "#9e9e9e", strokeDashstyle: "dash" },
     UNDER_LOCK: { strokeColor: "#c2185b", strokeDashstyle: "dash" },
     MICRO_SEGMENT: { strokeColor: "#00bcd4", strokeDashstyle: "solid" },
     LOOP: { strokeColor: "#795548", strokeDashstyle: "solid" },
@@ -1566,11 +1571,12 @@
     if (!currentName) {
       if (segment.junctionId !== null) return { kind: "skipped" };
       const suggestion = nearest && nearest.distanceM <= SUGGEST_MAX_M ? nearest.entry : null;
+      const status = suggestion === null && settings.geometryMatching ? "UNNAMED_NO_MATCH" : "UNNAMED";
       return {
         kind: "issue",
         issue: {
           ...baseIssue,
-          status: "UNNAMED",
+          status,
           suggestion: suggestion?.namePart ?? null,
           note: suggestion ? noteFor(suggestion) : null,
           fixable: suggestion !== null
@@ -2085,7 +2091,8 @@
     "MICRO_SEGMENT",
     "LOOP",
     "NARROW_MISUSE",
-    "OVER_LOCK"
+    "OVER_LOCK",
+    "UNNAMED_NO_MATCH"
   ];
   var DEFAULT_SETTINGS = {
     version: 2,
@@ -2093,7 +2100,8 @@
     autoScan: true,
     minZoom: 15,
     checkedRoadTypes: ROAD_TYPE_OPTIONS.filter((r) => r.defaultChecked).map((r) => r.id),
-    enabledStatuses: [...ALL_STATUSES],
+    // UNNAMED_NO_MATCH is legitimately-unnamed noise: present but hidden by default.
+    enabledStatuses: ALL_STATUSES.filter((s) => s !== "UNNAMED_NO_MATCH"),
     altNameCountsAsOk: true,
     cityScoping: "off",
     showMapLabels: true,
@@ -2331,7 +2339,8 @@ a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); bord
     MICRO_SEGMENT: "legendMICRO_SEGMENT",
     LOOP: "legendLOOP",
     NARROW_MISUSE: "legendNARROW_MISUSE",
-    OVER_LOCK: "legendOVER_LOCK"
+    OVER_LOCK: "legendOVER_LOCK",
+    UNNAMED_NO_MATCH: "legendUNNAMED_NO_MATCH"
   };
   var STATE_KEYS = {
     idle: "stateIdle",
@@ -2393,7 +2402,8 @@ a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); bord
     MICRO_SEGMENT: 9,
     LOOP: 10,
     NARROW_MISUSE: 11,
-    OVER_LOCK: 12
+    OVER_LOCK: 12,
+    UNNAMED_NO_MATCH: 13
   };
   function groupIssues(issues) {
     const groups = /* @__PURE__ */ new Map();
@@ -2492,7 +2502,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); bord
       brand.append(
         el("span", "chk-brand-icon", "🇨🇭"),
         el("span", "chk-brand-title", "CH Names"),
-        el("span", "chk-brand-version", `v${"1.13.0"}`)
+        el("span", "chk-brand-version", `v${"1.14.0"}`)
       );
       const toolbar = el("div", "chk-toolbar");
       const rescanBtn = el("button", "chk-btn", t("rescan"));
@@ -3255,7 +3265,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); bord
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.13.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.14.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();

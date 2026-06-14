@@ -10,7 +10,7 @@ describe("migrateSettings", () => {
   it("keeps v2 settings as-is, completed with defaults", () => {
     const migrated = migrateSettings({ version: 2, minZoom: 17 });
     expect(migrated.minZoom).toBe(17);
-    expect(migrated.enabledStatuses).toEqual(ALL_STATUSES);
+    expect(migrated.enabledStatuses).toEqual(DEFAULT_SETTINGS.enabledStatuses);
   });
 
   it("migrates v1 with showCosmetic=false to a grid without COSMETIC", () => {
@@ -36,5 +36,11 @@ describe("ALL_STATUSES", () => {
   it("includes the lock-level checks", () => {
     expect(ALL_STATUSES).toContain("UNDER_LOCK");
     expect(ALL_STATUSES).toContain("OVER_LOCK");
+  });
+
+  it("includes UNNAMED_NO_MATCH but hides it by default", () => {
+    expect(ALL_STATUSES).toContain("UNNAMED_NO_MATCH");
+    expect(DEFAULT_SETTINGS.enabledStatuses).not.toContain("UNNAMED_NO_MATCH");
+    expect(DEFAULT_SETTINGS.enabledStatuses).toContain("UNNAMED");
   });
 });

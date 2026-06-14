@@ -90,8 +90,20 @@ describe("evaluateSegment", () => {
     expect(v.kind).toBe("skipped");
   });
 
-  it("flags unnamed checkable segments", () => {
+  it("flags unnamed segments with no official street underneath as UNNAMED_NO_MATCH (geometry on)", () => {
+    // Default settings enable geometry matching; with no nearest official, the
+    // segment is legitimately unnamed.
     const v = evaluateSegment(makeSegment(), makeAddress(null), index, settings);
+    expect(v.kind).toBe("issue");
+    if (v.kind === "issue") {
+      expect(v.issue.status).toBe("UNNAMED_NO_MATCH");
+      expect(v.issue.fixable).toBe(false);
+    }
+  });
+
+  it("keeps unnamed segments as UNNAMED when geometry matching is off", () => {
+    const noGeometry: Settings = { ...DEFAULT_SETTINGS, geometryMatching: false };
+    const v = evaluateSegment(makeSegment(), makeAddress(null), index, noGeometry);
     expect(v.kind).toBe("issue");
     if (v.kind === "issue") {
       expect(v.issue.status).toBe("UNNAMED");

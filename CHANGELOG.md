@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.14.0] - 2026-06-14
+
+### Added
+- Unnamed segments are now split into two issue types. "UNNAMED" stays for segments that should be named — including every unnamed segment when geometry matching is off, and those with an official street found underneath (still fixable in one click). The new "UNNAMED_NO_MATCH" covers segments that are unnamed and have no official street underneath when geometry matching is on: these are usually legitimately unnamed, so the status is shown in grey and hidden by default — enable its chip to review them.
+
 ## [1.13.0] - 2026-06-14
 
 ### Added

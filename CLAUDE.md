@@ -37,6 +37,9 @@ A previous release shipped a broken test because the suite was never run; do not
 - `dist/...user.js` is **committed** and **is** the deployment: the userscript `@updateURL`
   points at `raw.githubusercontent.com/.../main/dist/...`. **Pushing to `main` updates every
   installed user immediately.**
+- Two remotes: `origin` (GitHub) is the **deployment** remote read by `@updateURL`/Greasy Fork;
+  `forgejo` (`git.npna.ch/Neprena/WME-CH-Street-Name-Checker`) is a **public mirror** for
+  redundancy. `/release` pushes both; a failed mirror push is non-blocking (GitHub still ships).
 - Always release through the **`/release` skill** (`.claude/skills/release/`). It runs the
   verification loop, updates `CHANGELOG.md`, bumps + builds, commits, tags `vX.Y.Z`, and pushes.
 - **Push only via `/release`, and only after explicit user confirmation.** Never run
