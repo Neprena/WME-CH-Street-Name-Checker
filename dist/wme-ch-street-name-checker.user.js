@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WME CH Street Name Checker
 // @namespace    https://github.com/Neprena
-// @version      1.12.0
+// @version      1.12.1
 // @description  Validates Waze street names against the official Swiss street register (répertoire officiel des rues, swisstopo / geo.admin.ch)
 // @author       Yann Rapenne
 // @license      MIT
@@ -2206,7 +2206,7 @@ ${tokens}
 .chk-group-header:hover { background: var(--chk-info-bg); }
 .chk-badge { display: inline-block; min-width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 ${statusChipRules}
-.chk-group-names { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chk-group-names { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .chk-arrow { color: var(--chk-muted); }
 .chk-suggestion { font-weight: bold; color: var(--chk-primary); }
 .chk-note { color: var(--chk-muted); font-style: italic; }
@@ -2434,7 +2434,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); bord
       brand.append(
         el("span", "chk-brand-icon", "🇨🇭"),
         el("span", "chk-brand-title", "CH Names"),
-        el("span", "chk-brand-version", `v${"1.12.0"}`)
+        el("span", "chk-brand-version", `v${"1.12.1"}`)
       );
       const toolbar = el("div", "chk-toolbar");
       const rescanBtn = el("button", "chk-btn", t("rescan"));
@@ -3196,7 +3196,7 @@ a.chk-geolink { text-decoration: none; border: 1px solid var(--chk-border); bord
     new EditPanelBox(sdk2, scanner, settings).init();
     registerShortcuts(sdk2, scanner, settings, { nextIssue: () => tab.selectNextIssue() });
     scanner.start();
-    log.info(`v${"1.12.0"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
+    log.info(`v${"1.12.1"} ready (SDK ${sdk2.getSDKVersion()}, WME ${sdk2.getWMEVersion()})`);
   }
   main().catch((err) => log.error("Initialization failed", err));
 })();

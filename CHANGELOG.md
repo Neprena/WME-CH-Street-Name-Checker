@@ -3,6 +3,11 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.12.1] - 2026-06-14
+
+### Fixed
+- Group headers no longer cut off the names with an ellipsis: the current name and its suggestion now wrap onto several lines so the full text stays readable, instead of being truncated to fit one line next to the "Fix all" button.
+
 ## [1.12.0] - 2026-06-14
 
 ### Added

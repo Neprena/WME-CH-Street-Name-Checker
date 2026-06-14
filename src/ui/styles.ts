@@ -96,7 +96,7 @@ ${tokens}
 .chk-group-header:hover { background: var(--chk-info-bg); }
 .chk-badge { display: inline-block; min-width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 ${statusChipRules}
-.chk-group-names { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chk-group-names { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .chk-arrow { color: var(--chk-muted); }
 .chk-suggestion { font-weight: bold; color: var(--chk-primary); }
 .chk-note { color: var(--chk-muted); font-style: italic; }
