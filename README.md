@@ -4,7 +4,7 @@
 
 # WME CH Street Name Checker
 
-**[➜ Installer / Installieren / Installa / Install](https://raw.githubusercontent.com/Neprena/WME-CH-Street-Name-Checker/main/dist/wme-ch-street-name-checker.user.js)** · [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) · [Changelog](CHANGELOG.md) · Licence MIT · © Data: swisstopo
+**[➜ Installer / Installieren / Installa / Install](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker)** · [Changelog](CHANGELOG.md) · Licence MIT · © Data: swisstopo
 
 Userscript Tampermonkey pour le [Waze Map Editor](https://www.waze.com/editor) - validation des noms de rues contre le répertoire officiel suisse. Interface disponible en français, allemand, italien et anglais.
 
@@ -53,7 +53,7 @@ Compare les noms de rues des segments visibles avec le **répertoire officiel de
 ## Installation
 
 1. Installer [Tampermonkey](https://www.tampermonkey.net/) (sous Chrome: activer le mode développeur dans `chrome://extensions`).
-2. Installer le script, depuis [GitHub](https://raw.githubusercontent.com/Neprena/WME-CH-Street-Name-Checker/main/dist/wme-ch-street-name-checker.user.js) ou via [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - les mises à jour sont ensuite automatiques.
+2. Installer le script depuis [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - les mises à jour sont ensuite automatiques.
 
 </details>
 
@@ -102,7 +102,7 @@ Vergleicht die Strassennamen der sichtbaren Segmente mit dem **amtlichen Strasse
 ## Installation
 
 1. [Tampermonkey](https://www.tampermonkey.net/) installieren (Chrome: Entwicklermodus in `chrome://extensions` aktivieren).
-2. Das Skript installieren, von [GitHub](https://raw.githubusercontent.com/Neprena/WME-CH-Street-Name-Checker/main/dist/wme-ch-street-name-checker.user.js) oder über [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - Updates erfolgen danach automatisch.
+2. Das Skript über [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) installieren - Updates erfolgen danach automatisch.
 
 </details>
 
@@ -151,7 +151,7 @@ Confronta i nomi delle strade dei segmenti visibili con il **repertorio ufficial
 ## Installazione
 
 1. Installare [Tampermonkey](https://www.tampermonkey.net/) (Chrome: attivare la modalità sviluppatore in `chrome://extensions`).
-2. Installare lo script, da [GitHub](https://raw.githubusercontent.com/Neprena/WME-CH-Street-Name-Checker/main/dist/wme-ch-street-name-checker.user.js) oppure da [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - gli aggiornamenti sono poi automatici.
+2. Installare lo script da [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - gli aggiornamenti sono poi automatici.
 
 </details>
 
@@ -200,7 +200,7 @@ Compares the street names of visible segments with the Swiss federal **official 
 ## Installation
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) (Chrome: enable developer mode in `chrome://extensions`).
-2. Install the script, from [GitHub](https://raw.githubusercontent.com/Neprena/WME-CH-Street-Name-Checker/main/dist/wme-ch-street-name-checker.user.js) or from [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - updates are then automatic.
+2. Install the script from [Greasy Fork](https://greasyfork.org/scripts/582690-wme-ch-street-name-checker) - updates are then automatic.
 
 </details>
 
